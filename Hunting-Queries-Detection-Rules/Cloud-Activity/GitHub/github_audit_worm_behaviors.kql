@@ -1,0 +1,17 @@
+// Title: GitHub audit indicators of worm/backdoor behavior
+// Product: Sentinel | Cloud-Activity/GitHub
+// ATT&CK: T1568 (Exfil to Code Repo), T1136 (Create Account), T1195 (Supply Chain)
+// Data Sources: GitHubAuditLog
+// Description: Finds risky repo/publicization, token/OAuth events, workflow backdoor attempts.
+// Author: Ahsan M.
+
+let startTime = ago(30d);
+GitHubAuditLog
+| where TimeGenerated >= startTime
+| where Action in~ ("repo.create","repo.rename","repo.publicized","repo.add_member","repo.transfer",
+                    "oauth_authorization.create","org.create_member","secret_scanning_push_protection.bypass")
+       or Action has "workflow" or Action has "actions"
+| extend lowerArgs = tolower(Args)
+| where lowerArgs has_any ("public","token","secret","trufflehog","gitleaks","npm","postinstall","bundle.js")
+| project TimeGenerated, Actor, Repo, Action, Args, Country, TransportProtocol, SourceAddress
+| order by TimeGenerated desc
