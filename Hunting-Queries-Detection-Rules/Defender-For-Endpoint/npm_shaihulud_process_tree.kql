@@ -3,7 +3,6 @@
 // ATT&CK: T1195.002 (Supply Chain), T1059 (Command), T1105 (Exfil over C2), T1078 (Valid Accounts)
 // Data Sources: DeviceProcessEvents
 // Description: Finds npm/npx/node installs that spawn curl/wget/PowerShell/bash/git/secret scanners.
-//
 // Author: Ahsan M.
 let startTime = ago(30d);
 DeviceProcessEvents
