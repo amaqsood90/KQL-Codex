@@ -4,6 +4,7 @@
 // Data Sources: DeviceProcessEvents, Watchlist: ShaiHuludNPMPackages
 // Description: Matches npm install commands against a watchlist of package names.
 // Author: Ahsan M.
+// Add confirmed IOCs into a watchlist
 
 let startTime = ago(30d);
 let badpkgs =
