@@ -25,6 +25,6 @@ DeviceNetworkEvents
 ) on DeviceId, InitiatingProcessId
 | join kind=leftouter npmInstalls on DeviceId
 | where isnotempty(InstallTime) and PTime between (InstallTime .. InstallTime + installWindow)
-| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, InitiatingProcessCommandLine,
+| project Timestamp, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine,
           RemoteUrl, RemoteIP, RemotePort, FileName, ProcessCommandLine
 | order by Timestamp desc
