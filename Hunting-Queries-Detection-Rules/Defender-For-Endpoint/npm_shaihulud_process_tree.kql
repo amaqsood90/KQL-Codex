@@ -1,0 +1,18 @@
+// Title: npm → postinstall chain spawning exfil/propagation tools
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1195.002 (Supply Chain), T1059 (Command), T1105 (Exfil over C2), T1078 (Valid Accounts)
+// Data Sources: DeviceProcessEvents
+// Description: Finds npm/npx/node installs that spawn curl/wget/PowerShell/bash/git/secret scanners.
+//
+// Author: Ahsan M.
+let startTime = ago(30d);
+DeviceProcessEvents
+| where Timestamp >= startTime
+| where InitiatingProcessFileName in~ ("npm","npx","node")
+   or ProcessCommandLine has_any ("npm i","npm install","npx ")
+| extend p = tolower(ProcessCommandLine)
+| where p has_any ("postinstall","bundle.js","install.js","prepare")
+   or FileName in~ ("node","bash","sh","powershell.exe","pwsh.exe","curl","wget","git","gh","trufflehog")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine,
+          InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessId, ProcessId, DeviceId
+| order by Timestamp asc
