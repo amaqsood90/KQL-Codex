@@ -85,6 +85,8 @@ KQL-Codex/
 
 └─ 📂 Hunting-Queries-Detection-Rules/
     ├─ 🔑 AzureAD/                  # Sign-ins, MFA abuse, risky user detections
+    ├─ 🔑 📁 Campaigns/             # Organized campaign indices & combined queries
+    │   └─ 🧪 Shai-Hulud-2025/        # Shai-Hulud npm campaign queries and index
     ├─ ☁️ Cloud-Activity/            # Suspicious Azure activity, key vault access, automation accounts
     │   └─ 🐙 GitHub/                 # GitHub audit logs & raw content, suspicious access
     ├─ 💻 Defender-For-Endpoint/      # Endpoint detection, persistence, malware activity
@@ -93,13 +95,8 @@ KQL-Codex/
     ├─ 🌐 Network-Logs/               # DNS, proxy, and firewall-based hunting
     ├─ 🛰 Sentinel/                  # UEBA anomalies, incident pivots, custom rules
     ├─ 🗂 ThreatIntel-Integrations/   # Watchlist/IoC hunts & threat intel feeds
-    
-        └─ 📁 Campaigns/                  # Organized campaign indices & combined queries
+     ->   README.md                    # You are here!
 
-        └─ 🧪 Shai-Hulud-2025/        # Shai-Hulud npm campaign queries and index
-
-
-                         # You are here!
 
 ---
 
