@@ -1,30 +1,21 @@
-// Title: GitHub egress shortly after npm install
+// Title: npm-driven egress to GitHub/raw/gist/webhook bins
 // Product: Sentinel | Defender-For-Endpoint
-// ATT&CK: T1105 (Exfil over C2), T1041 (Exfil over Web Services)
+// ATT&CK: T1105 (Exfil over Web Services)
 // Data Sources: DeviceNetworkEvents, DeviceProcessEvents
-// Description: Correlates GitHub traffic within a window after npm install.
+// Description: Identifies network traffic to GitHub, raw.githubusercontent.com, gist.github.com or webhook bins within 30 minutes after an npm install.
 // Author: Ahsan M.
 
-let startTime = ago(30d);
 let installWindow = 30m;
-let npmInstalls =
-    DeviceProcessEvents
-    | where Timestamp >= startTime
-    | where tolower(ProcessCommandLine) has_any ("npm install", "npm i")
-    | project DeviceId, InstallTime = Timestamp, InitiatingProcessId, ProcessId;
-
+let npmInstalls = DeviceProcessEvents
+| where Timestamp >= datetime(2025-07-01)
+| where tolower(ProcessCommandLine) has_any ("npm install","npm i")
+| project DeviceId, InstallTime=Timestamp;
 DeviceNetworkEvents
-| where Timestamp >= startTime
-| where RemoteUrl has_any ("github.com", "api.github.com", "raw.githubusercontent.com", "gist.github.com")
-   or (RemotePort in (22, 443) and RemoteIPType == "Public"
-       and tolower(InitiatingProcessFileName) in ("git", "gh", "node", "curl", "wget"))
-| join kind=innerunique (
-    DeviceProcessEvents
-    | where Timestamp >= startTime
-    | project DeviceId, PTime = Timestamp, InitiatingProcessId, ProcessId, FileName, ProcessCommandLine
-) on DeviceId, InitiatingProcessId
+| where Timestamp >= datetime(2025-07-01)
+| where RemoteUrl has_any ("github.com","api.github.com","raw.githubusercontent.com","gist.github.com","webhook.site")
+    or (RemotePort in (22,443) and RemoteIPType == "Public" and tolower(InitiatingProcessFileName) in ("git","gh","node","curl","wget"))
 | join kind=leftouter npmInstalls on DeviceId
-| where isnotempty(InstallTime) and PTime between (InstallTime .. InstallTime + installWindow)
-| project Timestamp, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine,
-          RemoteUrl, RemoteIP, RemotePort, FileName, ProcessCommandLine
+| where isnotempty(InstallTime) and Timestamp between (InstallTime .. InstallTime + installWindow)
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, InitiatingProcessCommandLine,
+          RemoteUrl, RemoteIP, RemotePort
 | order by Timestamp desc
