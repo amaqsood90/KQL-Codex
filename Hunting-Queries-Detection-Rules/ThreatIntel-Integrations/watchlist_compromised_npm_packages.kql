@@ -1,0 +1,19 @@
+// Title: Watchlist match for compromised npm packages
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1195.002 (Supply Chain)
+// Data Sources: DeviceProcessEvents, Watchlist: ShaiHuludNPMPackages
+// Description: Matches npm install commands against a watchlist of package names.
+// Author: Ahsan M.
+
+let startTime = ago(30d);
+let badpkgs =
+    _GetWatchlist('ShaiHuludNPMPackages')
+    | project PackageName = tolower(PackageName);
+DeviceProcessEvents
+| where Timestamp >= startTime
+| extend cmd = tolower(ProcessCommandLine)
+| where cmd has_any ("npm install","npm i")
+| join kind=innerunique badpkgs on $left.cmd has $right.PackageName
+| project Timestamp, DeviceName, AccountName, SuspiciousPackage = PackageName,
+          ProcessCommandLine, InitiatingProcessCommandLine
+| order by Timestamp desc
