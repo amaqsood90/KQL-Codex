@@ -1,0 +1,16 @@
+// Title: Suspicious git/gh activity likely spawned by build scripts
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1021 (Lateral Movement), T1608 (Develop Capabilities), T1568 (Exfil to Code Repo)
+// Data Sources: DeviceProcessEvents
+// Description: Flags forced pushes, repo creation, token usage from npm/runner parents.
+// Author: Ahsan M.
+
+let startTime = ago(30d);
+DeviceProcessEvents
+| where Timestamp >= startTime
+| where FileName in~ ("git", "gh")
+| extend cmd = tolower(ProcessCommandLine)
+| where cmd has_any ("push --force", " push ", "commit -m", "remote add", "token", "gh repo create", "gh api", "gist create")
+| where InitiatingProcessFileName in~ ("npm", "node", "bash", "sh", "powershell.exe", "pwsh.exe")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by Timestamp desc
