@@ -82,17 +82,24 @@ Whether you're a Tier-1 analyst investigating alerts or a seasoned threat hunter
 
 ```
 KQL-Codex/
-│
-├── 📂 AzureAD/                    # Azure AD & Identity-focused queries
-├── 📂 Cloud-Activity/              # Azure activity & cloud resource monitoring
-├── 📂 Defender-For-Endpoint/      # MDE endpoint detection & hunting
-├── 📂 Defender-For-Identity/      # MDI identity threat detection
-├── 📂 Defender-For-Office365/     # MDO email & collaboration security
-├── 📂 Network-Logs/                # Network traffic analysis
-├── 📂 Sentinel/                    # Microsoft Sentinel specific
-│   ├── UEBA_anomalies.kql
-└── 📄 README.md                    # You are here! 
-```
+
+└─ 📂 Hunting-Queries-Detection-Rules/
+    ├─ 🔑 AzureAD/                  # Sign-ins, MFA abuse, risky user detections
+    ├─ ☁️ Cloud-Activity/            # Suspicious Azure activity, key vault access, automation accounts
+    │   └─ 🐙 GitHub/                 # GitHub audit logs & raw content, suspicious access
+    ├─ 💻 Defender-For-Endpoint/      # Endpoint detection, persistence, malware activity
+    ├─ 🧬 Defender-For-Identity/AD/   # Defender for Identity detection queries
+    ├─ ✉️ Defender-For-Office365/     # Email & phishing detection queries
+    ├─ 🌐 Network-Logs/               # DNS, proxy, and firewall-based hunting
+    ├─ 🛰 Sentinel/                  # UEBA anomalies, incident pivots, custom rules
+    ├─ 🗂 ThreatIntel-Integrations/   # Watchlist/IoC hunts & threat intel feeds
+    
+        └─ 📁 Campaigns/                  # Organized campaign indices & combined queries
+
+        └─ 🧪 Shai-Hulud-2025/        # Shai-Hulud npm campaign queries and index
+
+
+                         # You are here!
 
 ---
 
