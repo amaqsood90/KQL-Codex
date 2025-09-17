@@ -1,0 +1,15 @@
+// Title: Artifact creation from npm hooks (bundle.js/install.js)
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1105 (Ingress Tool Transfer), T1059 (Command)
+// Data Sources: DeviceFileEvents
+// Description: Detects creation of suspicious JS artifacts around node_modules following npm activity.
+// Author: Ahsan M.
+
+let startTime = ago(30d);
+DeviceFileEvents
+| where Timestamp >= startTime
+| where tolower(FileName) in ("bundle.js", "install.js", "prepare.js")
+   or tolower(FolderPath) has_any ("\\node_modules\\", "/node_modules/")
+| where InitiatingProcessFileName in~ ("npm", "node")
+| project Timestamp, DeviceName, AccountName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by Timestamp desc
