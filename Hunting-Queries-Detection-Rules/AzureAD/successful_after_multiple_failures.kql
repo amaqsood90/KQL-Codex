@@ -1,0 +1,13 @@
+// Title: Successful Login After Multiple Failures
+// Product: Sentinel | AzureAD
+// ATT&CK: T1110 (Brute Force)
+// Data Sources: SigninLogs
+// Description: Detects instances where a user successfully logs in immediately after multiple failed attempts, indicating a possible credential stuffing or brute force attempt followed by account compromise.
+// Author: Ahsan M.
+
+SigninLogs
+| project TimeGenerated, UserPrincipalName, IPAddress, ResultType
+| serialize
+| extend prev = prev(ResultType), prevTime = prev(TimeGenerated)
+| where ResultType == "0" and prev in ("50074","50126","50055","50057")
+| project UserPrincipalName, IPAddress, LoginTime=TimeGenerated, LastFailed=prevTime
