@@ -1,0 +1,17 @@
+// Title: Linux persistence via systemd / cron
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1543.002 (Launch Agent), T1078 (Valid Accounts)
+// Data Sources: DeviceFileEvents, DeviceInfo
+// Description: Detects modifications to systemd services or cron jobs by npm/node/bash/python processes on Linux hosts.
+// Author: Ahsan M.
+
+let linux = DeviceInfo | where OSPlatform has "Linux" | project DeviceId;
+DeviceFileEvents
+| where Timestamp >= ago(60d)
+| join kind=inner linux on DeviceId
+| where FolderPath has_any (
+    "/etc/systemd/system/","/usr/lib/systemd/system/","~/.config/systemd/user/",
+    "/etc/cron.d/","/etc/cron.daily/","/etc/cron.hourly/","/etc/crontab")
+| where InitiatingProcessFileName in~ ("npm","node","bash","sh","python")
+| project Timestamp, DeviceName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by Timestamp desc
