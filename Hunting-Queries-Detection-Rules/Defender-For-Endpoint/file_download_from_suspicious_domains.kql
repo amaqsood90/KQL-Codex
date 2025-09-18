@@ -1,0 +1,11 @@
+// Title: File Download from Suspicious Domains
+// Product: Sentinel | Defender for Endpoint
+// ATT&CK: T1105 (Ingress Tool Transfer) 
+// Data Sources: DeviceFileEvents
+// Description: Identifies file downloads from suspicious domains by looking at DeviceFileEvents where the initiating process is typically a known download utility and the file origin URL contains suspicious top-level domains or known code hosting services. Helps detect malicious file downloads from untrusted sources.
+// Author: Ahsan M.
+
+DeviceFileEvents
+| where InitiatingProcessFileName in ("powershell.exe","cmd.exe","bitsadmin.exe","mshta.exe")
+| where FileOriginUrl has_any (".ru",".cn","raw.githubusercontent.com","pastebin.com")
+| project Timestamp, DeviceName, AccountName, FileName, FileOriginUrl
