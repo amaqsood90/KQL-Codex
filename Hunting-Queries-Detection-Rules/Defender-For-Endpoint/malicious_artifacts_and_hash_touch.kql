@@ -1,0 +1,26 @@
+// Title: Malicious artifacts & IOC hash touch
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1105 (Exfiltration), T1005 (Data from Local System)
+// Data Sources: DeviceFileEvents, DeviceNetworkEvents
+// Description: Detects creation of malicious artifacts by IOC hashes and suspicious egress to known webhook endpoints.
+// Author: Ahsan M.
+
+let sha256_iocs = dynamic(["46faab8ab153fae6e80e7cca38eab363075bb524edd79e42269217a083628f09", "b74caeaa75e077c99f7d44f46daaf9796a3be43ecf24f2a1fd381844669da777", "dc67467a39b70d1cd4c1f7f7a459b35058163592f4a9e8fb4dffcbba98ef210c", "4b2399646573bb737c4969563303d8ee2e9ddbd1b271f1ca9e35ea78062538db"]);
+let url_iocs = dynamic(["hxxps://webhook.site/bb8ca5f6-4175-45d2-b042-fc9ebb8170b7"]);
+// File events
+let file_events = DeviceFileEvents
+| where Timestamp >= ago(60d)
+| where SHA256 in (sha256_iocs)
+| project Timestamp, DeviceName, EventType = "FileEvent",
+    Details = strcat("File: ", FileName, " | Path: ", FolderPath, " | SHA256: ", SHA256),
+    InitiatingProcessFileName, InitiatingProcessCommandLine;
+// Network events
+let network_events = DeviceNetworkEvents
+| where Timestamp >= ago(60d)
+| where RemoteUrl has_any (url_iocs)
+| project Timestamp, DeviceName, AccountName = InitiatingProcessAccountName, EventType = "NetworkEvent",
+    Details = strcat("URL: ", RemoteUrl, " | IP: ", RemoteIP),
+    InitiatingProcessFileName, InitiatingProcessCommandLine;
+
+union file_events, network_events
+| order by Timestamp desc
