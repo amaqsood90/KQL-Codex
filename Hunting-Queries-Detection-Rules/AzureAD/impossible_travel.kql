@@ -1,0 +1,16 @@
+// Title: Impossible Travel
+// Product: Sentinel | AzureAD
+// ATT&CK: T1078 (Valid Accounts)
+// Data Sources: SigninLogs
+// Description: Detects suspicious impossible travel patterns where a user signs in from different locations and IP addresses within a short time frame, indicating possible account compromise or session hijacking.
+// Author: Ahsan M.
+
+SigninLogs
+| summarize FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by UserPrincipalName, IPAddress, Location
+| join kind=inner (
+    SigninLogs
+    | summarize FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated) by UserPrincipalName, IPAddress, Location
+) on UserPrincipalName
+| where Location != Location1 and IPAddress != IPAddress1 // Ensure different IP addresses and abs(datetime_diff('hour', LastSeen, FirstSeen1)) <= 2
+| project UserPrincipalName, FirstLocation = Location, FirstIP = IPAddress, FirstSeen, LastSeen, SecondLocation = Location1, SecondIP = IPAddress1, SecondFirstSeen = FirstSeen1, SecondLastSeen = LastSeen1, TimeDifferenceHours = datetime_diff('hour', LastSeen, FirstSeen1)
+| order by UserPrincipalName, FirstSeen
