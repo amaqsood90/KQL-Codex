@@ -1,0 +1,11 @@
+// Title: Rare Admin Logins
+// Product: Sentinel | AzureAD
+// ATT&CK: T1078 (Valid Accounts)
+// Data Sources: SigninLogs
+// Description: Flags rare logins by administrator accounts by identifying admin or administrator logins and highlighting those with fewer than three sign-ins within a day.
+// Author: Ahsan M.
+
+SigninLogs
+| where UserPrincipalName has_any ("admin","administrator")
+| summarize count() by UserPrincipalName, IPAddress, bin(TimeGenerated, 1d)
+| where count_ < 3
