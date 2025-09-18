@@ -1,0 +1,11 @@
+// Title: New Process Execution (EDR)
+// Product: Sentinel | Endpoint
+// ATT&CK: T1059 (Command and Scripting Interpreter)
+// Data Sources: DeviceProcessEvents
+// Description: Identifies newly observed process executions by listing processes that have only one occurrence across DeviceProcessEvents, highlighting potential first-time or rare processes.
+// Author: Ahsan M.
+
+DeviceProcessEvents
+| summarize count() by FileName
+| where count_ == 1
+| project NewProcess=FileName, DeviceName
