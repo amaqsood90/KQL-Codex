@@ -1,0 +1,11 @@
+// Title: Lateral Movement — Remote Service Creation
+// Product: Sentinel | Defender for Endpoint
+// ATT&CK: T1021 (Remote Services)
+// Data Sources: DeviceProcessEvents
+// Description: Detects potential lateral movement by identifying the creation of remote services or remote execution tools. Flags instances where sc.exe is used to create a service or psexec is executed, which may indicate lateral movement across devices.
+// Author: Ahsan M.
+
+DeviceProcessEvents
+| where ProcessCommandLine has "sc.exe create"
+    or ProcessCommandLine has "psexec"
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine
