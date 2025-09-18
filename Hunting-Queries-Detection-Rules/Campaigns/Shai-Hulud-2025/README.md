@@ -9,6 +9,10 @@
 - **MDE:** [GitHub egress after npm install](../../Defender-For-Endpoint/npm_to_github_egress_windowed.kql)
 - **MDE:** [Suspicious git/gh activity](../../Defender-For-Endpoint/suspicious_git_gh_activity_from_build_hosts.kql)
 - **MDE:** [Artifact creation from hooks](../../Defender-For-Endpoint/npm_hook_artifact_creation.kql)
+- **MDE:** [macOS persistence via LaunchAgents/Daemons](../../Defender-For-Endpoint/macos_launchagents_daemons_persistence.kql)
+- **MDE:** [Linux persistence via systemd/cron](../../Defender-For-Endpoint/linux_systemd_cron_persistence.kql)
+- **MDE:** [Malicious artifacts & IOC hash touch](../../Defender-For-Endpoint/malicious_artifacts_and_hash_touch.kql)
+- **MDE:** [Artifact → Exfil correlation](../../Defender-For-Endpoint/artifact_to_exfil_correlation.kql)
 - **GitHub:** [Audit worm behaviors](../../Cloud-Activity/GitHub/github_audit_worm_behaviors.kql)
 - **Watchlist:** [Compromised npm packages](../../ThreatIntel-Integrations/watchlist_compromised_npm_packages.kql)
 
