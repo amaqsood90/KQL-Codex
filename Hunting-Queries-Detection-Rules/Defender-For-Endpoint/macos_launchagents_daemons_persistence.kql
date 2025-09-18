@@ -1,0 +1,16 @@
+// Title: macOS persistence via LaunchAgents/Daemons
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1547.009 (Launch Agent), T1547.015 (Launch Daemon)
+// Data Sources: DeviceFileEvents, DeviceInfo
+// Description: Detects persistence on macOS by monitoring LaunchAgents and LaunchDaemons for plist files invoked by npm/node/bash/sh/osascript.
+// Author: Ahsan M.
+
+let macs = DeviceInfo | where OSPlatform == "macOS" | project DeviceId;
+DeviceFileEvents
+| where Timestamp >= ago(60d)
+| join kind=inner macs on DeviceId
+| where FolderPath has_any ("/Library/LaunchAgents/","/Library/LaunchDaemons/","/System/Library/LaunchDaemons/","/Users/")
+| where tolower(FileName) endswith ".plist"
+| where InitiatingProcessFileName in~ ("npm","node","bash","sh","zsh","python","osascript")
+| project Timestamp, DeviceName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by Timestamp desc
