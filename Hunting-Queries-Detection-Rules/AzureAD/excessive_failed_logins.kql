@@ -1,0 +1,12 @@
+// Title: Excessive Failed Logins
+// Product: Sentinel | AzureAD
+// ATT&CK: T1110 (Brute Force)
+// Data Sources: SigninLogs
+// Description: Detects accounts with an excessive number of failed logins in Azure AD by counting failed authentication results within hourly windows and filtering on counts greater than 10.
+// Author: Ahsan M.
+
+SigninLogs
+| where ResultType in ("50074", "50126", "50055", "50057")  // failed auth codes
+| summarize FailedAttempts = count() by UserPrincipalName, IPAddress, bin(TimeGenerated, 1h)
+| where FailedAttempts > 10
+| order by FailedAttempts desc
