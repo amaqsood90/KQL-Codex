@@ -1,0 +1,11 @@
+// Title: Suspicious PowerShell Usage
+// Product: Sentinel | Endpoint
+// ATT&CK: T1059.001 (PowerShell)
+// Data Sources: DeviceProcessEvents
+// Description: Detects suspicious PowerShell command line usage by searching for encoded or hidden execution flags or IEX commands, which may indicate script-based attacks or obfuscation.
+// Author: Ahsan M.
+
+DeviceProcessEvents
+| where FileName =~ "powershell.exe"
+| where ProcessCommandLine has_any ("-enc","-nop","-w hidden","-exec bypass","IEX")
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine
