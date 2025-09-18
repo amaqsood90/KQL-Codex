@@ -1,0 +1,11 @@
+// Title: Account Lockouts
+// Product: Sentinel | AzureAD
+// ATT&CK: T1110 (Brute Force)
+// Data Sources: SigninLogs
+// Description: Identifies user account lockouts by scanning Azure AD SigninLogs for result code 50053 and summarizing lockouts per user per hour.
+// Author: Ahsan M.
+
+SigninLogs
+| where ResultType == "50053"  // account lockout
+| summarize Lockouts = count() by UserPrincipalName, bin(TimeGenerated, 1h)
+| order by Lockouts desc
