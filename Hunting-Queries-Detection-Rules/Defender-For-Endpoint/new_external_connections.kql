@@ -1,0 +1,11 @@
+// Title: New External Connections
+// Product: Sentinel | Endpoint
+// ATT&CK: T1071 (Application Layer Protocol)
+// Data Sources: DeviceNetworkEvents
+// Description: Detects initial outbound network connections to previously unseen public IP addresses, identifying potential data exfiltration or command and control channels.
+// Author: Ahsan M.
+
+DeviceNetworkEvents
+| where RemoteIPType == "Public"
+| summarize count() by RemoteIP, InitiatingProcessFileName
+| where count_ == 1
