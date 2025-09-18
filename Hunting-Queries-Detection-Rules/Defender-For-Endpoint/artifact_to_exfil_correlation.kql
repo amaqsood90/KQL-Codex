@@ -1,0 +1,24 @@
+// Title: Artifact → Exfil correlation
+// Product: Sentinel | Defender-For-Endpoint
+// ATT&CK: T1105 (Exfiltration), T1005 (Data from Local System)
+// Data Sources: DeviceFileEvents, DeviceNetworkEvents
+// Description: Correlates creation of suspicious artifacts with outbound connections to GitHub and webhook endpoints within a 10-minute window.
+// Author: Ahsan M.
+
+let t0 = datetime(2025-07-01);
+let win = 10m;
+let artifact = DeviceFileEvents
+| where Timestamp >= t0
+| extend f = tolower(FileName)
+| where f in ("data.json","bundle.js","install.js","postinstall.js")
+| where InitiatingProcessFileName in~ ("npm","node")
+| project DeviceId, ATime = Timestamp, FileName, FolderPath;
+
+DeviceNetworkEvents
+| where Timestamp >= t0
+| where RemoteUrl has_any ("webhook.site","raw.githubusercontent.com","api.github.com","gist.github.com")
+| project DeviceId, NTime = Timestamp, RemoteUrl, RemoteIP, RemotePort,
+          InitiatingProcessFileName, InitiatingProcessCommandLine
+| join kind=inner artifact on DeviceId
+| where NTime between (ATime .. ATime + win)
+| order by NTime desc
