@@ -1,0 +1,11 @@
+// Title: White Lock Ransomware Indicators (fbin and c0ntact.txt)
+// Product: Sentinel | Defender for Endpoint
+// ATT&CK: T1486 (Data Encrypted for Impact)
+// Data Sources: DeviceFileEvents
+// Description: Detects potential White Lock ransomware infections by looking for creation of files with the .fbin extension and the ransom note c0ntact.txt, which CYFIRMA identified as White Lock’s IOCs.
+// Author: Ahsan M.
+
+DeviceFileEvents
+| where FileName endswith ".fbin" or FileName == "c0ntact.txt"
+| summarize FirstSeen=min(Timestamp), LastSeen=max(Timestamp), Count=count() by DeviceName, AccountName, InitiatingProcessFileName, FileName
+| order by Count desc
