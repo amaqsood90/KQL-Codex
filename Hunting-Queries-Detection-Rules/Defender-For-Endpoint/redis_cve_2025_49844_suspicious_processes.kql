@@ -1,0 +1,12 @@
+// Title: Redis CVE-2025-49844 Suspicious Child Processes
+// Product: Sentinel | Defender for Endpoint
+// ATT&CK: T1055 (Process Injection) | T1203 (Exploitation for Client Execution)
+// Data Sources: DeviceProcessEvents
+// Description: Monitors for redis-server spawning shell or scripting processes (bash, sh, python, perl, cmd.exe, powershell) which could indicate exploitation of the RediShell vulnerability, enabling attackers to execute code on the host.
+// Author: Ahsan M.
+
+DeviceProcessEvents
+| where InitiatingProcessFileName has_any ("redis-server", "redis-server.exe")
+| where FileName has_any ("bash", "sh", "python", "perl", "cmd.exe", "powershell.exe")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, FileName, ProcessCommandLine
+| order by Timestamp desc
