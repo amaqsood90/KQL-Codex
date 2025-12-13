@@ -1,0 +1,38 @@
+// Title: React2Shell Malicious Node/Bun Process Behaviour
+// Product: Microsoft Defender for Endpoint – Advanced Hunting
+// ATT&CK: T1059.003 (Command & Script Interpreter: JavaScript), T1105 (Ingress Tool Transfer), T1082 (System Information Discovery)
+// Data Sources: DeviceProcessEvents, DeviceNetworkEvents
+// Description: Detects suspicious executions of Node.js or Bun processes indicative of React2Shell exploitation.  Attackers leverage the CVE‑2025‑55182 pre‑authentication vulnerability to execute arbitrary code on vulnerable servers and subsequently run PowerShell, curl or wget commands to download payloads such as `healthcheck.dll`, `setup_c3pool_miner.bat`, cryptominers or post‑exploitation toolkits like Secret‑Hunter【677298509385333†L1330-L1360】.  They may also run enumeration commands (`whoami`, `id`, `uname`), disable Microsoft Defender, or invoke tools like **TruffleHog** and **Gitleaks** to harvest secrets【677298509385333†L1330-L1360】.  This query hunts for Node/Bun processes with command‑lines containing these behavioural indicators.  Tune to allow legitimate developer workloads.
+// Author: Ahsan M.
+
+// Hunt for suspicious Node/Bun processes executing external commands or downloading tools
+let suspiciousStrings = dynamic([
+    "curl", "wget", "Invoke-WebRequest", "Invoke-Expression", 
+    "healthcheck.dll", "setup_c3pool_miner", "c3pool", 
+    "trufflehog", "gitleaks", "setup_bun.js", "bun_environment.js",
+    "trycloudflare.com", "\.sh", ".zip", ".tar.gz"
+]);
+let suspiciousArgs = dynamic(["whoami", "id", "uname", "cat /etc/passwd", "powershell", "cmd "]);
+DeviceProcessEvents
+| where Timestamp > ago(14d)
+| where ProcessName in~ ("node", "node.exe", "bun", "bun.exe", "bunjs", "bunjs.exe")
+| where CommandLine has_any (suspiciousStrings) or CommandLine has_any (suspiciousArgs)
+// project relevant details for triage
+| project Timestamp, DeviceName, AccountName, FileName=ProcessName, CommandLine,
+    ParentProcessName, InitiatingProcessFileName, InitiatingProcessCommandLine
+
+// Tuning: exclude known safe Node/Bun services (e.g., internal build agents or monitoring scripts) by filtering on trusted parent process names, known directories or signed binaries.  Consider maintaining an allowlist of legitimate Node applications.
+
+// Validation: simulate a React2Shell payload by running a simple Node script that executes a curl or PowerShell command and verify that this query returns the event.  For example, run `node -e "require('child_process').exec('whoami')"` or `bun run https://example.com/test.sh` on a test system.  Ensure the hunting query flags the process without producing excessive noise from benign developer workloads.
+
+// MITRE Mapping: 
+//  - T1059.003 – Command & Script Interpreter: JavaScript (Node/Bun used to execute shell commands)
+//  - T1105 – Ingress Tool Transfer (download of external payloads via curl/wget)
+//  - T1082 – System Information Discovery (enumeration commands like `whoami`, `id`, `uname`)
+
+// Recommended Alert Rule Settings:
+//  - Schedule: every 15 minutes
+//  - Lookup window: 1 hour
+//  - Threshold: >0 results
+//  - Severity: High
+//  - Entity mappings: DeviceName (hostname), AccountName (user), FileName
