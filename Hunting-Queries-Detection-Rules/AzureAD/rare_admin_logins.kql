@@ -1,12 +1,19 @@
-﻿// Title: Rare Admin Logins
-// Product: Sentinel | AzureAD
-// Query Type: Threat Hunting
-// ATT&CK: T1078 (Valid Accounts)
-// Data Sources: SigninLogs
-// Description: Flags rare logins by administrator accounts by identifying admin or administrator logins and highlighting those with fewer than three sign-ins within a day.
-// Author: Ahsan M.
+// Title:        Rare Admin Logins
+// Product:      Sentinel
+// Query Type:   Threat Hunting
+// ATT&CK:       T1078 (Valid Accounts)
+// Data Sources: SigninLogs, IdentityInfo
+// Description:  Identifies privileged accounts (via Entra ID directory roles in IdentityInfo) with fewer than 3 successful sign-ins in any 24-hour window, surfacing rare admin logins that may indicate account compromise or misuse.
+// Author:       Ahsan M.
 
+let PrivilegedAccounts =
+    IdentityInfo
+    | where array_length(AssignedRoles) > 0
+    | project AccountUpn, AssignedRoles;
 SigninLogs
-| where UserPrincipalName has_any ("admin","administrator")
-| summarize count() by UserPrincipalName, IPAddress, bin(TimeGenerated, 1d)
-| where count_ < 3
+| where ResultType == 0
+| join kind=inner PrivilegedAccounts on $left.UserPrincipalName == $right.AccountUpn
+| summarize SignInCount = count() by UserPrincipalName, IPAddress, tostring(AssignedRoles), bin(TimeGenerated, 1d)
+| where SignInCount < 3
+| project TimeGenerated, UserPrincipalName, AssignedRoles, IPAddress, SignInCount
+| order by TimeGenerated desc
