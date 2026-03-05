@@ -1,13 +1,21 @@
-﻿// Title: New External Connections
-// Product: Sentinel | Endpoint
-// Query Type: Threat Hunting
-// ATT&CK: T1071 (Application Layer Protocol)
-// Data Sources: DeviceNetworkEvents
-// Description: Detects initial outbound network connections to previously unseen public IP addresses,
-// identifying potential data exfiltration or command and control channels.
-// Author: Ahsan M.
+// Title:        External Connections to Threat Intel IPs
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1071 (Application Layer Protocol)
+// Data Sources: DeviceNetworkEvents, ThreatIntelIndicators
+// Description:  Matches outbound connections to public IPs against active threat intelligence indicators, surfacing potential C2 or exfiltration traffic to known malicious infrastructure.
+// Author:       Ahsan M.
 
+let MaliciousIPs =
+    ThreatIntelIndicators
+    | where IsActive == true
+    | where Revoked == false
+    | where ObservableKey == "ipv4-addr:value"
+    | where ValidUntil > now() or isnull(ValidUntil)
+    | project MaliciousIP = ObservableValue, Confidence, Pattern;
 DeviceNetworkEvents
+| where TimeGenerated > ago(1d)
 | where RemoteIPType == "Public"
-| summarize count() by RemoteIP, InitiatingProcessFileName
-| where count_ == 1
+| join kind=inner MaliciousIPs on $left.RemoteIP == $right.MaliciousIP
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, RemoteIP, RemotePort, Confidence, Pattern
+| order by Confidence desc, TimeGenerated desc
