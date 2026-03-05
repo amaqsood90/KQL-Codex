@@ -1,20 +1,20 @@
-﻿# Shai Hulud (npm) - 2025 Campaign
+# Shai Hulud (npm) - 2025 Campaign
 
 **Scope:** npm supply-chain postinstall abuse, secret scanning, GitHub egress and organization abuse.
 
 ## Queries
 
-- **MDE:** [npm postinstall chain](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/npm_shaihulud_process_tree.kql)
-- **MDE:** [Secret scanners invoked](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/npm_secret_scanners_invoked.kql)
-- **MDE:** [GitHub egress after npm install](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/npm_to_github_egress_windowed.kql)
-- **MDE:** [Suspicious git/gh activity](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/suspicious_git_gh_activity_from_build_hosts.kql)
-- **MDE:** [Artifact creation from hooks](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/npm_hook_artifact_creation.kql)
-- **MDE:** [macOS persistence via LaunchAgents/Daemons](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/macos_launchagents_daemons_persistence.kql)
-- **MDE:** [Linux persistence via systemd/cron](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/linux_systemd_cron_persistence.kql)
-- **MDE:** [Malicious artifacts & IOC hash touch](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/malicious_artifacts_and_hash_touch.kql)
-- **MDE:** [Artifact to Exfil correlation](../../Hunting-Queries-Detection-Rules/Defender-For-Endpoint/artifact_to_exfil_correlation.kql)
-- **GitHub:** [Audit worm behaviors](../../Hunting-Queries-Detection-Rules/Cloud-Activity/GitHub/github_audit_worm_behaviors.kql)
-- **Watchlist:** [Compromised npm packages](../../Hunting-Queries-Detection-Rules/ThreatIntel-Integrations/watchlist_compromised_npm_packages.kql)
+- **MDE:** [npm postinstall chain](../../Defender-For-Endpoint/npm_shaihulud_process_tree.kql)
+- **MDE:** [Secret scanners invoked](../../Defender-For-Endpoint/npm_secret_scanners_invoked.kql)
+- **MDE:** [GitHub egress after npm install](../../Defender-For-Endpoint/npm_to_github_egress_windowed.kql)
+- **MDE:** [Suspicious git/gh activity](../../Defender-For-Endpoint/suspicious_git_gh_activity_from_build_hosts.kql)
+- **MDE:** [Artifact creation from hooks](../../Defender-For-Endpoint/npm_hook_artifact_creation.kql)
+- **MDE:** [macOS persistence via LaunchAgents/Daemons](../../Defender-For-Endpoint/macos_launchagents_daemons_persistence.kql)
+- **MDE:** [Linux persistence via systemd/cron](../../Defender-For-Endpoint/linux_systemd_cron_persistence.kql)
+- **MDE:** [Malicious artifacts & IOC hash touch](../../Defender-For-Endpoint/malicious_artifacts_and_hash_touch.kql)
+- **MDE:** [Artifact to Exfil correlation](../../Defender-For-Endpoint/artifact_to_exfil_correlation.kql)
+- **GitHub:** [Audit worm behaviors](../../Cloud-Activity/GitHub/github_audit_worm_behaviors.kql)
+- **Watchlist:** [Compromised npm packages](../../ThreatIntel-Integrations/watchlist_compromised_npm_packages.kql)
 
 ## Watchlist
 
