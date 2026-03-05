@@ -1,0 +1,37 @@
+﻿// Title: React2Shell Suspicious File Creation in Temporary Directories
+// Product: Microsoft Defender for Endpoint - Advanced Hunting
+// Query Type: Detection Rule
+// ATT&CK: T1036 (Masquerading), T1105 (Ingress Tool Transfer), T1070.004 (File Deletion)
+// Data Sources: DeviceFileEvents
+// Description: Detects file creations in temporary directories associated with React2Shell exploitation.
+// Attackers drop payloads such as healthcheck.dll, setup_c3pool_miner.bat and malicious JS files
+// into /tmp on Linux or C:\Windows\Temp on Windows.
+// Author: Ahsan M.
+
+let suspiciousFiles = dynamic(["healthcheck.dll", "setup_c3pool_miner.bat", "setup_bun.js", "bun_environment.js"]);
+DeviceFileEvents
+| where Timestamp > ago(14d)
+| where (FolderPath contains "/tmp"
+       or FolderPath startswith @"C:\Windows\Temp"
+       or FolderPath startswith @"C:\Users\Public\AppData\Local\Temp"
+       or FolderPath startswith @"C:\Users\Public\AppData\LocalLow\Temp")
+| where FileName has_any (suspiciousFiles) or FileName matches regex @".*\.(dll|so|sh|bat|js)$"
+| project Timestamp, DeviceName, FileName, FolderPath, Sha256, InitiatingProcessFileName, InitiatingProcessCommandLine
+
+// Tuning: Exclude known legitimate temporary files created by installers or update agents.
+// Filter on trusted initiating processes such as WindowsUpdate or msiexec.
+
+// Validation: Copy a benign DLL with a suspicious name (e.g. healthcheck.dll) into the system
+// temp directory on a test endpoint and confirm the query picks it up.
+
+// MITRE Mapping:
+//  - T1036 - Masquerading
+//  - T1105 - Ingress Tool Transfer
+//  - T1070.004 - File Deletion
+
+// Recommended Alert Rule Settings:
+//  - Schedule: every 1 hour
+//  - Lookup window: 24 hours
+//  - Threshold: >0 results
+//  - Severity: Medium
+//  - Entity mappings: DeviceName (hostname), FileName, Sha256

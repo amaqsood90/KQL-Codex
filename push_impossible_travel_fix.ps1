@@ -1,0 +1,66 @@
+# KQL-Codex | Fix: impossible_travel.kql
+# Run this from inside your KQL-Codex directory in PowerShell
+
+git pull
+
+$content = @'
+// Title: Impossible Travel Detection
+// Product: Sentinel | AzureAD
+// Query Type: Threat Hunting
+// ATT&CK: T1078 (Valid Accounts)
+// Data Sources: SigninLogs
+// Description: Hunts for users who successfully sign in from two geographically
+// distinct locations within a 2-hour window — a pattern consistent with session
+// hijacking, credential sharing, or account compromise. Uses serialize/prev()
+// to compare consecutive sign-ins per user without a cartesian self-join.
+// Only considers successful sign-ins (ResultType 0) to reduce noise.
+// Author: Ahsan M.
+
+SigninLogs
+| where TimeGenerated > ago(14d)
+| where ResultType == "0"                          // successful sign-ins only
+| where isnotempty(Location) and isnotempty(IPAddress)
+| project TimeGenerated, UserPrincipalName, IPAddress, Location, AppDisplayName
+| order by UserPrincipalName asc, TimeGenerated asc
+| serialize
+| extend PrevTime     = prev(TimeGenerated),
+         PrevLocation = prev(Location),
+         PrevIP       = prev(IPAddress),
+         PrevUser     = prev(UserPrincipalName)
+| where UserPrincipalName == PrevUser              // same user
+| where Location != PrevLocation                  // different country/region
+| where IPAddress != PrevIP                       // different IP
+| where datetime_diff('minute', TimeGenerated, PrevTime) <= 120  // within 2 hours
+| project
+    UserPrincipalName,
+    FirstLocation  = PrevLocation,
+    FirstIP        = PrevIP,
+    FirstSeen      = PrevTime,
+    SecondLocation = Location,
+    SecondIP       = IPAddress,
+    SecondSeen     = TimeGenerated,
+    MinutesBetween = datetime_diff('minute', TimeGenerated, PrevTime),
+    AppDisplayName
+| order by MinutesBetween asc                      // shortest gaps are highest priority
+
+// Tuning: Narrow results by adding "| where MinutesBetween < 60" for tighter
+// confidence. Allowlist known VPN exit nodes, corporate proxy IPs, or satellite
+// ranges that produce recurring false positives. Filter out service accounts or
+// shared mailboxes by excluding known UPN patterns (e.g. "| where
+// UserPrincipalName !has "svc-").
+
+// Validation: Use a VPN to simulate logins from two different countries within
+// the window. Confirm the query surfaces the pair with correct MinutesBetween
+// value. Verify that consecutive same-location logins for the same user do NOT
+// appear in results.
+
+// MITRE Mapping:
+//  - T1078 – Valid Accounts (legitimate credentials used from anomalous locations)
+'@
+
+$filePath = "Hunting-Queries-Detection-Rules\AzureAD\impossible_travel.kql"
+Set-Content -Path $filePath -Value $content -Encoding UTF8
+
+git add $filePath
+git commit -m "fix(AzureAD): rewrite impossible_travel.kql - replace broken cartesian self-join with serialize/prev() pattern, convert to hunting query"
+git push
