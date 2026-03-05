@@ -1,194 +1,267 @@
-﻿# KQL-Codex
+<div align="center">
 
-![KQL](https://img.shields.io/badge/KQL-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
-![Microsoft Sentinel](https://img.shields.io/badge/Microsoft%20Sentinel-0078D4?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
-![Defender](https://img.shields.io/badge/Microsoft%20Defender-00BCF2?style=for-the-badge&logo=microsoft&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure-0089D0?style=for-the-badge&logo=microsoftazure&logoColor=white)
+# KQL-Codex
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amaqsood90/KQL-Codex/issues)
-[![Made with KQL](https://img.shields.io/badge/Made%20with-KQL-blue.svg)](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/)
-[![GitHub Stars](https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=social)](https://github.com/amaqsood90/KQL-Codex/stargazers)
+<img src="https://img.shields.io/badge/KQL-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white"/>
+<img src="https://img.shields.io/badge/Microsoft_Sentinel-0078D4?style=for-the-badge&logo=microsoftsqlserver&logoColor=white"/>
+<img src="https://img.shields.io/badge/Defender_XDR-00BCF2?style=for-the-badge&logo=microsoft&logoColor=white"/>
+<img src="https://img.shields.io/badge/Entra_ID-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white"/>
 
-**An evolving collection of threat hunting and detection logic for defenders working with the Microsoft security stack.**
+<br/>
 
-[Explore Queries](#repository-structure) | [Quick Start](#quick-start) | [Contributing](#contributing)
+<img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square"/>
+<img src="https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=flat-square&color=yellow"/>
+<img src="https://img.shields.io/github/last-commit/amaqsood90/KQL-Codex?style=flat-square&color=blue"/>
+<img src="https://img.shields.io/badge/Queries-50%2B-brightgreen?style=flat-square"/>
+<img src="https://img.shields.io/badge/Campaigns-4-orange?style=flat-square"/>
+<img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square"/>
+
+<br/><br/>
+
+### Production-grade KQL detection content for Microsoft Sentinel and Defender XDR defenders
+### Every query ships with MITRE mapping · tuning guidance · validation steps · alert rule settings
+
+<br/>
+
+> Built for the community. Freely available. Continuously updated.
+
+</div>
 
 ---
 
-## About
+## Why KQL-Codex
 
-**KQL-Codex** is a comprehensive library of Kusto Query Language (KQL) scripts designed to accelerate security operations, threat hunting, and incident response across the Microsoft security ecosystem.
+There are plenty of KQL repositories. This one is different in a few ways:
 
-Whether you are a Tier-1 analyst investigating alerts or a seasoned threat hunter pursuing advanced adversaries, this repository provides battle-tested queries to enhance your defensive capabilities.
+- **Campaign-driven** — detections are built around real active threats, not generic patterns
+- **Production-ready** — every query includes tuning guidance, validation steps, and alert rule settings so you can deploy with confidence
+- **Behavior-based** — detections focus on attacker behavior, not brittle IOCs that rotate daily
+- **Full kill chain** — campaign packs cover initial access through exfiltration, not just one stage
+- **Microsoft-native** — built exclusively on Microsoft security tables so everything works out of the box in Sentinel and Defender XDR
 
-### Key Features
+---
 
-- **SOC Operations** - Streamline daily security operations with production-ready queries
-- **Proactive Threat Hunting** - Hunt for advanced threats and suspicious behaviors
-- **Incident Investigation** - Accelerate incident response with forensic analysis queries
-- **Detection Engineering** - Build and tune custom detection rules
-- **Campaign Packs** - Organized detection sets mapped to real-world attack campaigns
+## Campaign Detection Packs
 
-### Built For
+Purpose-built detection sets tracking active real-world campaigns, built within days of exploitation being observed in the wild.
 
-| Platform | Coverage |
-|----------|----------|
-| Microsoft Sentinel | Analytics rules, hunting queries, UEBA |
-| Microsoft Defender for Endpoint | Process, file, network, and identity telemetry |
-| Microsoft Defender for Identity | AD and Kerberos attack detection |
-| Microsoft Defender for Office 365 | Email, phishing, and BEC detection |
-| Azure AD / Entra ID | Sign-in analytics, privilege escalation, MFA abuse |
-| Azure Activity Logs | Resource monitoring, configuration changes |
+<table>
+<tr>
+<td width="50%">
+
+### React2Shell-2025
+**CVE-2025-55182 | Active Exploitation**
+
+Pre-auth RCE in React Server Components. Attackers deployed crypto miners, Cobalt Strike beacons, and the Secret-Hunter credential harvesting toolkit via Node and Bun process abuse.
+
+**4 detections** covering HTTP header exploitation, process behavior, C2 communications, and payload drops in temp directories.
+
+`T1190` `T1059.003` `T1105` `T1071.001` `T1567.002`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/React2Shell-2025/)
+
+</td>
+<td width="50%">
+
+### Shai-Hulud-2025
+**npm Supply Chain | Postinstall Abuse**
+
+Malicious npm packages abusing postinstall hooks to invoke secret scanners (TruffleHog, Gitleaks), exfiltrate credentials to GitHub and webhook endpoints, and establish persistence across Windows, Linux, and macOS.
+
+**11 detections** covering the full kill chain including a Sentinel watchlist integration for compromised package names.
+
+`T1195.002` `T1552` `T1543.002` `T1547.009` `T1568`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/Shai-Hulud-2025/)
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### SharePoint-2025
+**CVE-2025-53770 | ToolShell**
+
+Chained SharePoint zero-days exploited by Chinese APT groups including Linen Typhoon (APT27) and Violet Typhoon (APT31) targeting government and healthcare sectors globally.
+
+**1 detection** targeting exploit request patterns to the vulnerable ToolPane.aspx endpoint.
+
+`T1190`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/SharePoint-2025/)
+
+</td>
+<td width="50%">
+
+### White-Lock-2025
+**Ransomware | October 2025**
+
+Newly observed ransomware strain identified by CYFIRMA. Encrypts files with the `.fbin` extension and drops `c0ntact.txt` ransom notes across compromised endpoints.
+
+**1 detection** covering file encryption IOCs and ransom note creation behavior.
+
+`T1486`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/White-Lock-2025/)
+
+</td>
+</tr>
+</table>
 
 ---
 
 ## Repository Structure
-
 ```
 KQL-Codex/
-â””â”€â”€ Hunting-Queries-Detection-Rules/
-    â”œâ”€â”€ AzureAD/                        # Sign-ins, MFA abuse, risky user detections
-    â”œâ”€â”€ Campaigns/                      # Organized campaign detection packs
-    â”‚   â”œâ”€â”€ React2Shell-2025/           # CVE-2025-55182 React Server Components RCE
-    â”‚   â”œâ”€â”€ Shai-Hulud-2025/            # npm supply chain postinstall abuse
-    â”‚   â”œâ”€â”€ SharePoint-2025/            # CVE-2025-53770 ToolShell exploitation
-    â”‚   â””â”€â”€ White-Lock-2025/            # White Lock ransomware campaign
-    â”œâ”€â”€ Cloud-Activity/                 # Suspicious Azure activity, key vault access
-    â”‚   â””â”€â”€ GitHub/                     # GitHub audit log hunting
-    â”œâ”€â”€ Defender-For-Endpoint/          # Endpoint detection, persistence, malware
-    â”œâ”€â”€ Defender-For-Identity/AD/       # Kerberos attacks, AD enumeration
-    â”œâ”€â”€ Defender-For-Office365/         # Email and phishing detection
-    â”œâ”€â”€ Network-Logs/                   # DNS, proxy, and firewall-based hunting
-    â”œâ”€â”€ Sentinel/                       # UEBA anomalies, incident pivots
-    â””â”€â”€ ThreatIntel-Integrations/       # Watchlist and IoC-based hunts
-```
-
----
-
-## Quick Start
-
-### Prerequisites
-
-- Access to Microsoft Sentinel, Microsoft Defender XDR, or Azure Data Explorer
-- Appropriate permissions to run KQL queries in your environment
-
-### Getting Started
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/amaqsood90/KQL-Codex.git
-   cd KQL-Codex
-   ```
-
-2. **Navigate to Your Use Case**
-   - Browse folders matching your log source (e.g., `AzureAD/` or `Defender-For-Endpoint/`)
-   - Each query includes MITRE mapping, tuning guidance, and validation steps
-
-3. **Copy and Deploy**
-   - Copy `.kql` file content to your Sentinel hunting pane or Analytics Rule Wizard
-   - Adjust time ranges, thresholds, and allowlists for your environment
-
----
-
-## Query Conventions
-
-All queries follow consistent documentation standards.
-
-### File Naming Convention
-
-```
-<purpose>_<signal>_<entity>.kql
-```
-
-Examples: `signin_risky_users.kql`, `npm_shaihulud_process_tree.kql`
-
-### Query Header Template
-
-```kql
-// Title: [Descriptive Query Title]
-// Product: [Sentinel | MDE | MDI | MDO | Azure]
-// Query Type: [Threat Hunting | Detection Rule]
-// ATT&CK: [MITRE ATT&CK Technique IDs]
-// Data Sources: [Tables used in query]
-// Description: [What the query detects and why it matters]
-// Author: Ahsan M.
+|
++-- Hunting-Queries-Detection-Rules/
+    |
+    +-- AzureAD/                        Sign-ins, brute force, MFA abuse, impossible travel
+    |
+    +-- Campaigns/                      Active threat campaign detection packs
+    |   +-- React2Shell-2025/           CVE-2025-55182 | Node RCE, crypto miners, C2
+    |   +-- Shai-Hulud-2025/            npm supply chain | postinstall, secret scanning
+    |   +-- SharePoint-2025/            CVE-2025-53770 | ToolShell, APT27, APT31
+    |   +-- White-Lock-2025/            White Lock ransomware | .fbin encryption
+    |
+    +-- Cloud-Activity/                 Azure resource abuse, automation, key vault
+    |   +-- GitHub/                     GitHub audit log worm and backdoor hunting
+    |
+    +-- Defender-For-Endpoint/          Process, file, network, and persistence detection
+    +-- Defender-For-Identity/AD/       Kerberos attacks, DCSync, AD enumeration
+    +-- Defender-For-Office365/         Phishing, BEC, malicious attachments
+    +-- Network-Logs/                   DNS tunneling, proxy abuse, CVE exploitation
+    +-- Sentinel/                       UEBA anomalies, incident pivots, correlations
+    +-- ThreatIntel-Integrations/       Watchlist and IOC-driven hunting
 ```
 
 ---
 
 ## MITRE ATT&CK Coverage
 
-| Tactic | Coverage | Example Queries |
-|--------|----------|-----------------|
-| Initial Access | High | Phishing, Valid Accounts, Public-Facing App Exploitation |
-| Persistence | High | Registry Keys, Scheduled Tasks, LaunchAgents |
-| Privilege Escalation | Medium | Token Manipulation, Sudo Abuse |
-| Defense Evasion | High | Obfuscation, Indicator Removal, ETW Bypass |
-| Credential Access | High | Credential Dumping, Brute Force, MFA Fatigue |
-| Discovery | Medium | Network Scanning, Account Discovery |
-| Lateral Movement | High | Remote Services, Pass the Hash |
-| Command and Control | High | Web Protocols, DNS Tunneling, Graph API Abuse |
-| Exfiltration | Medium | Exfiltration Over C2, Cloud Storage, Code Repos |
+| Tactic | Techniques Covered |
+|---|---|
+| Initial Access | T1078, T1190, T1195.002 |
+| Execution | T1059.001, T1059.003 |
+| Persistence | T1543.002, T1547.009, T1547.015 |
+| Privilege Escalation | T1548.003 |
+| Defense Evasion | T1036, T1070.004 |
+| Credential Access | T1110, T1552 |
+| Discovery | T1082 |
+| Lateral Movement | T1021 |
+| Command and Control | T1071.001, T1567.002, T1105 |
+| Exfiltration | T1005, T1568 |
+| Impact | T1486 |
 
 ---
 
-## Campaign Detection Packs
+## Query Standards
 
-| Campaign | CVE / Threat | Queries |
-|----------|-------------|---------|
-| React2Shell-2025 | CVE-2025-55182 | 4 |
-| Shai-Hulud-2025 | npm Supply Chain | 11 |
-| SharePoint-2025 | CVE-2025-53770 | 1 |
-| White-Lock-2025 | White Lock Ransomware | 1 |
+Every query in this repository follows a consistent documentation standard so you always know what you are deploying.
+```kql
+// Title:        [Query name]
+// Product:      [Sentinel | MDE | MDI | MDO | Azure]
+// Query Type:   [Threat Hunting | Detection Rule]
+// ATT&CK:       [Technique ID] ([Technique Name])
+// Data Sources: [Tables used]
+// Description:  [What this detects and why it matters]
+// Author:       Ahsan M.
+//
+// Tuning:       [How to reduce false positives for your environment]
+// Validation:   [How to confirm the query works before deploying]
+//
+// Recommended Alert Rule Settings:
+//  - Schedule:        [e.g. every 15 minutes]
+//  - Lookup window:   [e.g. 1 hour]
+//  - Threshold:       [e.g. >0 results]
+//  - Severity:        [Low | Medium | High | Critical]
+//  - Entity mappings: [Account, Host, IP, etc.]
+```
+
+---
+
+## Quick Start
+```bash
+git clone https://github.com/amaqsood90/KQL-Codex.git
+cd KQL-Codex
+```
+
+1. Navigate to the folder matching your data source or use case
+2. Open any `.kql` file — every query is fully self-documented
+3. Paste into your Sentinel hunting pane or Analytics Rule Wizard
+4. Read the tuning and validation comments before deploying to production
+
+---
+
+## Threat Intelligence & News Sources
+
+Stay current with the threats this repository tracks. These are the primary sources used when building campaign detection packs.
+
+**Microsoft Security**
+- [Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/) — first-party threat research and Defender/Sentinel updates
+- [Microsoft Threat Intelligence](https://ti.defender.microsoft.com/) — Microsoft's threat intel portal
+- [MSRC Security Updates](https://msrc.microsoft.com/update-guide/) — official CVE advisories and patch guidance
+
+**Threat Research**
+- [CISA Advisories](https://www.cisa.gov/news-events/cybersecurity-advisories) — US government threat advisories and IOCs
+- [Unit 42 Threat Research](https://unit42.paloaltonetworks.com/) — Palo Alto Networks threat intelligence
+- [CrowdStrike Adversary Intelligence](https://www.crowdstrike.com/blog/category/threat-intelligence/) — adversary tracking and TTP analysis
+- [Elastic Security Labs](https://www.elastic.co/security-labs) — malware analysis and detection research
+- [Recorded Future Blog](https://www.recordedfuture.com/blog) — threat intelligence and campaign tracking
+
+**Vulnerability Tracking**
+- [NIST NVD](https://nvd.nist.gov/) — National Vulnerability Database
+- [CVE.org](https://www.cve.org/) — CVE details and references
+- [Exploit DB](https://www.exploit-db.com/) — public exploits and proof-of-concepts
+
+**Community & News**
+- [BleepingComputer](https://www.bleepingcomputer.com/) — breaking security news and malware coverage
+- [The Hacker News](https://thehackernews.com/) — daily cybersecurity news
+- [Krebs on Security](https://krebsonsecurity.com/) — investigative security journalism
+- [Dark Reading](https://www.darkreading.com/) — enterprise security news and analysis
+- [Infosecurity Magazine](https://www.infosecurity-magazine.com/) — threat campaign coverage
+
+**IOC Feeds & Hunting**
+- [VirusTotal](https://www.virustotal.com/) — file and URL analysis
+- [Shodan](https://www.shodan.io/) — internet-exposed infrastructure discovery
+- [URLhaus](https://urlhaus.abuse.ch/) — malicious URL tracking
+- [MalwareBazaar](https://bazaar.abuse.ch/) — malware sample database
+- [OTX AlienVault](https://otx.alienvault.com/) — open threat intelligence platform
 
 ---
 
 ## Contributing
 
-Contributions from the security community are welcome.
+Contributions from the defender community are welcome and encouraged.
 
 1. Fork the repository and create a feature branch
-2. Follow the query conventions outlined above
-3. Test your queries in a lab environment
-4. Submit a Pull Request with a clear description
+2. Follow the query header standard above
+3. Test your query in a lab or non-production environment
+4. Open a Pull Request with a clear description of the threat or behavior being detected
+
+For new campaign packs, include a `README.md` inside the campaign folder describing the threat, affected platforms, and how the queries fit together.
 
 ---
 
-## Learning Resources
+## Resources
 
-- [Official KQL Documentation](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/)
+- [KQL Documentation](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/)
+- [Advanced Hunting Schema Reference](https://docs.microsoft.com/en-us/microsoft-365/security/defender/advanced-hunting-schema-tables)
+- [Microsoft Sentinel Documentation](https://docs.microsoft.com/en-us/azure/sentinel/)
+- [MITRE ATT&CK Framework](https://attack.mitre.org/)
 - [KQL Playground](https://aka.ms/LADemo)
-- [Must Learn KQL Series](https://aka.ms/MustLearnKQL)
-- [Advanced Hunting Overview](https://docs.microsoft.com/en-us/microsoft-365/security/defender/advanced-hunting-overview)
-
----
-
-## Roadmap
-
-- [ ] Scattered Spider / Octo Tempest 2025 campaign pack
-- [ ] FinalDraft / REF7707 Graph API C2 campaign pack
-- [ ] Defender for Identity AD detection queries
-- [ ] Defender for Office 365 phishing and BEC queries
-- [ ] Azure Cloud Activity hunting queries
-- [ ] DNS tunneling and proxy-based hunting
-- [ ] UEBA and Sentinel correlation queries
+- [Must Learn KQL](https://aka.ms/MustLearnKQL)
 
 ---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+[MIT](LICENSE) — free to use, share, and adapt with attribution.
 
 ---
 
-## Contact
+<div align="center">
 
-**Maintained by:** Ahsan M.
+*Maintained by the Ahsan M. If this repository helps your defensive work, consider giving it a star and contributing a query.*
 
-- [LinkedIn](https://www.linkedin.com/in/ahsan-maqsood-03016488/)
-- [Email](mailto:am90@outlook.com)
-
----
-
-*Happy Hunting!*
+</div>
