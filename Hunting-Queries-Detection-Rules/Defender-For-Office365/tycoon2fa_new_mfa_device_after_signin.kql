@@ -1,0 +1,40 @@
+// Title:        Tycoon2FA New MFA Device Registered After Risky Sign-In
+// Product:      Defender XDR | Entra ID
+// Query Type:   Detection Rule
+// ATT&CK:       T1098.005 (Account Manipulation: Device Registration), T1557 (Adversary-in-the-Middle)
+// Data Sources: AADSignInEventsBeta, CloudAppEvents
+// Description:  Detects a new MFA method or authenticator app registered within 1 hour of a risky sign-in — Tycoon2FA operators register new MFA devices post-compromise to survive password resets.
+// Author:       Ahsan M.
+
+let lookback = 7d;
+let window = 1h;
+let mfaActions = dynamic([
+    "Update user.",
+    "User registered security info",
+    "User deleted security info",
+    "User registered all required security info",
+    "Admin registered security info for user",
+    "User started security info registration",
+    "Create device",
+    "Disable Strong Authentication."
+]);
+let riskySignins = AADSignInEventsBeta
+| where Timestamp > ago(lookback)
+| where RiskLevelDuringSignIn in (50, 100)
+| where ClientAppUsed == "Browser"
+| where isempty(DeviceTrustType)
+| project SigninTime = Timestamp, AccountObjectId, AccountUpn,
+          IPAddress, Country, RiskLevelDuringSignIn;
+CloudAppEvents
+| where Timestamp > ago(lookback)
+| where ActionType in (mfaActions)
+| where Application in ("Microsoft Azure Active Directory", "Office 365")
+| project MfaTime = Timestamp, AccountObjectId, AccountDisplayName,
+          ActionType, IPAddress, CountryCode, RawEventData
+| join kind=inner riskySignins on AccountObjectId
+| where (MfaTime - SigninTime) between (0min .. window)
+| project SigninTime, MfaTime, AccountUpn, AccountDisplayName,
+          AccountObjectId, ActionType,
+          SigninIP = IPAddress, MfaIP = IPAddress1,
+          Country, RiskLevelDuringSignIn, RawEventData
+| order by SigninTime desc

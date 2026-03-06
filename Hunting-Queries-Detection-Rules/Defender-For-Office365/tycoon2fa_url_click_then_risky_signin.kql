@@ -1,0 +1,27 @@
+// Title:        Tycoon2FA URL Click Followed by Risky Sign-In
+// Product:      Defender XDR | MDO | Entra ID
+// Query Type:   Detection Rule
+// ATT&CK:       T1566.002 (Phishing: Spearphishing Link), T1557 (Adversary-in-the-Middle)
+// Data Sources: UrlClickEvents, AADSignInEventsBeta
+// Description:  Correlates an allowed Safe Links URL click with a risky sign-in by the same user within 1 hour — high-confidence indicator of a Tycoon2FA redirect chain completing successfully.
+// Author:       Ahsan M.
+
+let lookback = 7d;
+let window = 1h;
+let riskySignins = AADSignInEventsBeta
+| where Timestamp > ago(lookback)
+| where RiskLevelDuringSignIn in (50, 100)
+| where ClientAppUsed == "Browser"
+| where isempty(DeviceTrustType)
+| project SigninTime = Timestamp, AccountUpn, AccountObjectId,
+          IPAddress, Country, RiskLevelDuringSignIn, SessionId, Application;
+UrlClickEvents
+| where Timestamp > ago(lookback)
+| where ActionType == "ClickAllowed"                // bypassed Safe Links
+| project ClickTime = Timestamp, AccountUpn, Url, NetworkMessageId
+| join kind=inner riskySignins on AccountUpn
+| where (SigninTime - ClickTime) between (0min .. window)
+| project ClickTime, SigninTime, AccountUpn, AccountObjectId,
+          Url, NetworkMessageId, IPAddress, Country,
+          RiskLevelDuringSignIn, Application, SessionId
+| order by ClickTime desc
