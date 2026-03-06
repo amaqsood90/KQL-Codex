@@ -1,0 +1,24 @@
+// Title:        Tycoon2FA AiTM Risky Sign-In Detection
+// Product:      Defender XDR | Entra ID
+// Query Type:   Detection Rule
+// ATT&CK:       T1557 (Adversary-in-the-Middle), T1078 (Valid Accounts)
+// Data Sources: AADSignInEventsBeta
+// Description:  Detects browser-based sign-ins from unmanaged non-compliant devices with medium or high Entra ID risk scores — primary indicator of AiTM session cookie interception as used by Tycoon2FA (Storm-1747).
+// Author:       Ahsan M.
+
+AADSignInEventsBeta
+| where Timestamp > ago(7d)
+| where IsManaged != 1
+| where IsCompliant != 1
+| where RiskLevelDuringSignIn in (50, 100)          // medium (50) or high (100) risk
+| where ClientAppUsed == "Browser"
+| where isempty(DeviceTrustType)
+| where isempty(DeviceName)
+| where isempty(AadDeviceId)
+| where isnotempty(AccountObjectId)
+| where isnotempty(IPAddress)
+| where isnotempty(State) or isnotempty(Country) or isnotempty(City)
+| project Timestamp, AccountUpn, AccountObjectId, IPAddress,
+          Country, State, City, Application, ApplicationId,
+          SessionId, RiskLevelDuringSignIn, Browser
+| order by RiskLevelDuringSignIn desc, Timestamp desc

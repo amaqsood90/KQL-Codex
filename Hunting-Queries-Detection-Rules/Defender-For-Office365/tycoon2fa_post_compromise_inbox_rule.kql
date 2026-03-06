@@ -1,0 +1,32 @@
+// Title:        Tycoon2FA Post-Compromise Inbox Rule Creation
+// Product:      Defender XDR | MDO
+// Query Type:   Detection Rule
+// ATT&CK:       T1137.005 (Office Application Startup: Outlook Rules), T1557 (Adversary-in-the-Middle)
+// Data Sources: AADSignInEventsBeta, CloudAppEvents
+// Description:  Detects inbox rules created within 2 hours of a risky sign-in — a common Tycoon2FA post-compromise action used to hide activity, forward mail, and maintain persistence after AiTM session cookie theft.
+// Author:       Ahsan M.
+
+let lookback = 7d;
+let window = 2h;
+let riskySignins = AADSignInEventsBeta
+| where Timestamp > ago(lookback)
+| where RiskLevelDuringSignIn in (50, 100)
+| where ClientAppUsed == "Browser"
+| where isempty(DeviceTrustType)
+| project SigninTime = Timestamp, AccountObjectId, AccountUpn,
+          IPAddress, Country, RiskLevelDuringSignIn;
+CloudAppEvents
+| where Timestamp > ago(lookback)
+| where Application == "Microsoft Exchange Online"
+| where ActionType in ("New-InboxRule", "Set-InboxRule",
+                       "Set-Mailbox", "UpdateInboxRules")
+| project RuleTime = Timestamp, AccountObjectId, AccountDisplayName,
+          ActionType, IPAddress, CountryCode,
+          RuleConfig = RawEventData.Parameters
+| join kind=inner riskySignins on AccountObjectId
+| where (RuleTime - SigninTime) between (0min .. window)
+| project SigninTime, RuleTime, AccountUpn, AccountDisplayName,
+          AccountObjectId, ActionType, RuleConfig,
+          SigninIP = IPAddress, RuleIP = IPAddress1,
+          Country, RiskLevelDuringSignIn
+| order by SigninTime desc
