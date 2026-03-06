@@ -127,31 +127,57 @@ Tycoon2FA enabled adversary-in-the-middle attacks at scale — intercepting sess
 
 ---
 
-## Repository Structure
-```
-KQL-Codex/
-|
-+-- Hunting-Queries-Detection-Rules/
-    |
-    +-- AzureAD/                        Sign-ins, brute force, MFA abuse, impossible travel
-    |
-    +-- Campaigns/                      Active threat campaign detection packs
-    |   +-- React2Shell-2025/           CVE-2025-55182 | Node RCE, crypto miners, C2
-    |   +-- Shai-Hulud-2025/            npm supply chain | postinstall, secret scanning
-    |   +-- SharePoint-2025/            CVE-2025-53770 | ToolShell, APT27, APT31
-    |   +-- White-Lock-2025/            White Lock ransomware | .fbin encryption
-    |   +-- Tycoon2FA-2026/             AiTM PhaaS | Storm-1747 | session cookie theft
-    |
-    +-- Cloud-Activity/                 Azure resource abuse, automation, key vault
-    |   +-- GitHub/                     GitHub audit log worm and backdoor hunting
-    |
-    +-- Defender-For-Endpoint/          Process, file, network, and persistence detection
-    +-- Defender-For-Identity/AD/       Kerberos attacks, DCSync, AD enumeration
-    +-- Defender-For-Office365/         Phishing, BEC, malicious attachments
-    +-- Network-Logs/                   DNS tunneling, proxy abuse, CVE exploitation
-    +-- Sentinel/                       UEBA anomalies, incident pivots, correlations
-    +-- ThreatIntel-Integrations/       Watchlist and IOC-driven hunting
-```
+## 🗂️ Repository Structure
+
+> `KQL-Codex/` &nbsp;›&nbsp; `Hunting-Queries-Detection-Rules/`
+
+<details>
+<summary>📁 <b>AzureAD/</b> &nbsp;·&nbsp; Sign-ins, brute force, MFA abuse, impossible travel</summary>
+</details>
+
+<details>
+<summary>📂 <b>Campaigns/</b> &nbsp;·&nbsp; Active threat campaign detection packs</summary>
+
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/React2Shell-2025/">React2Shell-2025</a> — CVE-2025-55182 · Node RCE · <code>T1190</code> <code>T1059</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Shai-Hulud-2025/">Shai-Hulud-2025</a> — npm supply chain abuse · <code>T1195.002</code> <code>T1552</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/SharePoint-2025/">SharePoint-2025</a> — CVE-2025-53770 · ToolShell · <code>T1190</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/White-Lock-2025/">White-Lock-2025</a> — White Lock ransomware · <code>T1486</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/">Tycoon2FA-2026</a> — AiTM PhaaS · Storm-1747 · <code>T1557</code> <code>T1566.002</code>
+</p>
+
+</details>
+
+<details>
+<summary>📂 <b>Cloud-Activity/</b> &nbsp;·&nbsp; Azure resource abuse, automation, key vault</summary>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;📁 <b>GitHub/</b> &nbsp;·&nbsp; GitHub audit log worm and backdoor hunting</p>
+
+</details>
+
+<details>
+<summary>📁 <b>Defender-For-Endpoint/</b> &nbsp;·&nbsp; Process, file, network, and persistence detection</summary>
+</details>
+
+<details>
+<summary>📁 <b>Defender-For-Identity/AD/</b> &nbsp;·&nbsp; Kerberos attacks, DCSync, AD enumeration</summary>
+</details>
+
+<details>
+<summary>📁 <b>Defender-For-Office365/</b> &nbsp;·&nbsp; Phishing, BEC, AiTM, malicious attachments</summary>
+</details>
+
+<details>
+<summary>📁 <b>Network-Logs/</b> &nbsp;·&nbsp; DNS tunneling, proxy abuse, CVE exploitation</summary>
+</details>
+
+<details>
+<summary>📁 <b>Sentinel/</b> &nbsp;·&nbsp; UEBA anomalies, incident pivots, correlations</summary>
+</details>
+
+<details>
+<summary>📁 <b>ThreatIntel-Integrations/</b> &nbsp;·&nbsp; Watchlist and IOC-driven hunting</summary>
+</details>
 
 ---
 
