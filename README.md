@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=flat-square&color=yellow"/>
 <img src="https://img.shields.io/github/last-commit/amaqsood90/KQL-Codex?style=flat-square&color=blue"/>
 <img src="https://img.shields.io/badge/Queries-50%2B-brightgreen?style=flat-square"/>
-<img src="https://img.shields.io/badge/Campaigns-4-orange?style=flat-square"/>
+<img src="https://img.shields.io/badge/Campaigns-5-orange?style=flat-square"/>
 <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square"/>
 
 <br/><br/>
@@ -106,6 +106,23 @@ Newly observed ransomware strain identified by CYFIRMA. Encrypts files with the 
 
 </td>
 </tr>
+<tr>
+<td width="50%">
+
+### Tycoon2FA-2026
+**AiTM PhaaS | Storm-1747 | Disrupted March 2026**
+
+Tycoon2FA enabled adversary-in-the-middle attacks at scale — intercepting session cookies to bypass MFA across 500,000+ organizations per month. Operated by Storm-1747, disrupted by Microsoft DCU and Europol on March 4, 2026.
+
+**4 detections** covering AiTM risky sign-ins, URL click to sign-in correlation, post-compromise inbox rules, and new MFA device registration.
+
+`T1557` `T1078` `T1566.002` `T1137.005` `T1098.005`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/)
+
+</td>
+<td width="50%"></td>
+</tr>
 </table>
 
 ---
@@ -123,6 +140,7 @@ KQL-Codex/
     |   +-- Shai-Hulud-2025/            npm supply chain | postinstall, secret scanning
     |   +-- SharePoint-2025/            CVE-2025-53770 | ToolShell, APT27, APT31
     |   +-- White-Lock-2025/            White Lock ransomware | .fbin encryption
+    |   +-- Tycoon2FA-2026/             AiTM PhaaS | Storm-1747 | session cookie theft
     |
     +-- Cloud-Activity/                 Azure resource abuse, automation, key vault
     |   +-- GitHub/                     GitHub audit log worm and backdoor hunting
@@ -141,14 +159,15 @@ KQL-Codex/
 
 | Tactic | Techniques Covered |
 |---|---|
-| Initial Access | T1078, T1190, T1195.002 |
+| Initial Access | T1078, T1190, T1195.002, T1566.002 |
 | Execution | T1059.001, T1059.003 |
-| Persistence | T1543.002, T1547.009, T1547.015 |
+| Persistence | T1098.005, T1137.005, T1543.002, T1547.009, T1547.015 |
 | Privilege Escalation | T1548.003 |
 | Defense Evasion | T1036, T1070.004 |
 | Credential Access | T1110, T1552 |
 | Discovery | T1082 |
 | Lateral Movement | T1021 |
+| Collection | T1557 |
 | Command and Control | T1071.001, T1567.002, T1105 |
 | Exfiltration | T1005, T1568 |
 | Impact | T1486 |
