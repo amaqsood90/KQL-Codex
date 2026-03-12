@@ -307,6 +307,6 @@ For new campaign packs, include a `README.md` inside the campaign folder describ
 
 <div align="center">
 
-*Maintained by the Ahsan M. If this repository helps your defensive work, consider giving it a star and contributing a query.*
+*Maintained by Ahsan M. If this repository helps your defensive work, consider giving it a star and contributing a query.*
 
 </div>
