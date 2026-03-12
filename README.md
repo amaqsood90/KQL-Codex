@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=flat-square&color=yellow"/>
 <img src="https://img.shields.io/github/last-commit/amaqsood90/KQL-Codex?style=flat-square&color=blue"/>
 <img src="https://img.shields.io/badge/Queries-50%2B-brightgreen?style=flat-square"/>
-<img src="https://img.shields.io/badge/Campaigns-5-orange?style=flat-square"/>
+<img src="https://img.shields.io/badge/Campaigns-6-orange?style=flat-square"/>
 <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square"/>
 
 <br/><br/>
@@ -121,7 +121,20 @@ Tycoon2FA enabled adversary-in-the-middle attacks at scale — intercepting sess
 [View Campaign](Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/)
 
 </td>
-<td width="50%"></td>
+<td width="50%">
+
+### Neusploit-2026
+**CVE-2026-21509 | APT28 Espionage**
+
+Russia-linked APT28 weaponized a Microsoft Office security feature bypass within 72 hours of disclosure, targeting government and military organizations across Central and Eastern Europe with MiniDoor and PixyNetLoader malware.
+
+**4 detections** covering Office exploitation behavior, Outlook VBA registry tamper, COM hijacking persistence, and Covenant Grunt C2 via filen.io cloud storage.
+
+`T1203` `T1059.003` `T1137` `T1112` `T1546.015` `T1071.001` `T1102`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/Neusploit-2026/)
+
+</td>
 </tr>
 </table>
 
@@ -143,7 +156,8 @@ Tycoon2FA enabled adversary-in-the-middle attacks at scale — intercepting sess
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Shai-Hulud-2025/">Shai-Hulud-2025</a> — npm supply chain abuse · <code>T1195.002</code> <code>T1552</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/SharePoint-2025/">SharePoint-2025</a> — CVE-2025-53770 · ToolShell · <code>T1190</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/White-Lock-2025/">White-Lock-2025</a> — White Lock ransomware · <code>T1486</code><br><br>
-&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/">Tycoon2FA-2026</a> — AiTM PhaaS · Storm-1747 · <code>T1557</code> <code>T1566.002</code>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/">Tycoon2FA-2026</a> — AiTM PhaaS · Storm-1747 · <code>T1557</code> <code>T1566.002</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Neusploit-2026/">Neusploit-2026</a> — APT28 · CVE-2026-21509 · <code>T1203</code> <code>T1546.015</code> <code>T1102</code>
 </p>
 
 </details>
@@ -186,15 +200,15 @@ Tycoon2FA enabled adversary-in-the-middle attacks at scale — intercepting sess
 | Tactic | Techniques Covered |
 |---|---|
 | Initial Access | T1078, T1190, T1195.002, T1566.002 |
-| Execution | T1059.001, T1059.003 |
-| Persistence | T1098.005, T1137.005, T1543.002, T1547.009, T1547.015 |
+| Execution | T1059.001, T1059.003, T1203 |
+| Persistence | T1098.005, T1112, T1137, T1137.005, T1543.002, T1546.015, T1547.009, T1547.015 |
 | Privilege Escalation | T1548.003 |
 | Defense Evasion | T1036, T1070.004 |
 | Credential Access | T1110, T1552 |
 | Discovery | T1082 |
 | Lateral Movement | T1021 |
 | Collection | T1557 |
-| Command and Control | T1071.001, T1567.002, T1105 |
+| Command and Control | T1071.001, T1102, T1567.002, T1105 |
 | Exfiltration | T1005, T1568 |
 | Impact | T1486 |
 
