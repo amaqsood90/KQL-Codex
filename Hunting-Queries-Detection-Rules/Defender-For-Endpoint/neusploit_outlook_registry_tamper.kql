@@ -1,0 +1,26 @@
+// Title:        Neusploit MiniDoor Outlook VBA Security Registry Tamper
+// Product:      MDE | Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1137 (Office Application Startup), T1112 (Modify Registry)
+// Data Sources: DeviceRegistryEvents
+// Description:  Detects modifications to Outlook macro security registry keys — MiniDoor lowers VBA security settings to install its malicious Outlook project, a key persistence step in APT28 Operation Neusploit.
+// Author:       Ahsan M.
+
+DeviceRegistryEvents
+| where Timestamp > ago(7d)
+| where RegistryKey has_all ("Microsoft", "Office")
+| where RegistryKey has "Outlook"
+| where RegistryKey has_any ("Security", "VBAWarnings", "Level")
+| where ActionType in ("RegistryValueSet", "RegistryKeyCreated")
+| where RegistryValueName has_any (
+    "VBAWarnings", "Level", "DisableAttachementsInPV",
+    "EnableOnlineContent", "MarkInternalAsUnsafe",
+    "ObjectModelGuard", "PromptOOMAddressInformationAccess",
+    "PromptOOMFormulaAccess", "PromptOOMSaveAs",
+    "PromptOOMSendMail", "AdminSecurityMode"
+  )
+| project Timestamp, DeviceId, DeviceName,
+          ActionType, RegistryKey, RegistryValueName,
+          RegistryValueData, InitiatingProcessFileName,
+          InitiatingProcessCommandLine
+| order by Timestamp desc

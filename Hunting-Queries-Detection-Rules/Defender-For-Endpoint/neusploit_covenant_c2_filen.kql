@@ -1,0 +1,22 @@
+// Title:        Neusploit Covenant Grunt C2 via Filen.io Cloud Storage
+// Product:      MDE | Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1071.001 (Application Layer Protocol: Web Protocols), T1102 (Web Service)
+// Data Sources: DeviceNetworkEvents
+// Description:  Detects outbound HTTPS connections to filen.io or its API endpoints — APT28 used the Filen cloud storage API as C2 infrastructure for Covenant Grunt implants in Operation Neusploit to blend with legitimate cloud traffic.
+// Author:       Ahsan M.
+
+DeviceNetworkEvents
+| where Timestamp > ago(7d)
+| where ActionType == "ConnectionSuccess"
+| where RemoteUrl has_any ("filen.io", "api.filen.io", "down.filen.io")
+       or RemoteIP in ("", "")                     // add filen.io resolved IPs if known
+| where isnotempty(InitiatingProcessFileName)
+| where InitiatingProcessFileName !in~ (
+    "msedge.exe", "chrome.exe", "firefox.exe",
+    "brave.exe", "opera.exe", "iexplore.exe"
+  )                                                 // exclude expected browser traffic
+| project Timestamp, DeviceId, DeviceName,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          RemoteUrl, RemoteIP, RemotePort, LocalIP
+| order by Timestamp desc
