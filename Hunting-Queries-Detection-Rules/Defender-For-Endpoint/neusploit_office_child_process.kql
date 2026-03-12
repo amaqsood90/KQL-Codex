@@ -1,0 +1,29 @@
+// Title:        Neusploit Office Process Spawning Suspicious Child Process
+// Product:      MDE | Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1203 (Exploitation for Client Execution), T1059.003 (Windows Command Shell)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects Office applications spawning suspicious child processes — primary behavioral indicator of CVE-2026-21509 exploitation as used by APT28 in Operation Neusploit to deliver MiniDoor and PixyNetLoader droppers.
+// Author:       Ahsan M.
+
+let officeProcesses = dynamic([
+    "WINWORD.EXE", "EXCEL.EXE", "POWERPNT.EXE",
+    "MSPUB.EXE", "MSACCESS.EXE", "WORDPAD.EXE"
+]);
+let suspiciousChildren = dynamic([
+    "cmd.exe", "powershell.exe", "wscript.exe", "cscript.exe",
+    "mshta.exe", "rundll32.exe", "regsvr32.exe", "msiexec.exe",
+    "certutil.exe", "bitsadmin.exe", "wmic.exe", "explorer.exe"
+]);
+DeviceProcessEvents
+| where Timestamp > ago(7d)
+| where InitiatingProcessFileName has_any (officeProcesses)
+| where FileName has_any (suspiciousChildren)
+| where InitiatingProcessFileName !has "setup"
+| project Timestamp, DeviceId, DeviceName,
+          ParentProcess = InitiatingProcessFileName,
+          ParentCommandLine = InitiatingProcessCommandLine,
+          ChildProcess = FileName,
+          ChildCommandLine = ProcessCommandLine,
+          AccountName, AccountDomain, FolderPath
+| order by Timestamp desc

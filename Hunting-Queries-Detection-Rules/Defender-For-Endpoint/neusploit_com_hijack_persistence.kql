@@ -1,0 +1,23 @@
+// Title:        Neusploit PixyNetLoader COM Hijacking Persistence
+// Product:      MDE | Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1546.015 (Event Triggered Execution: Component Object Model Hijacking)
+// Data Sources: DeviceRegistryEvents
+// Description:  Detects COM object hijacking via HKCU Software\Classes\CLSID registry writes — PixyNetLoader uses this technique to load EhStoreShell.dll into explorer.exe for persistent execution in APT28 Operation Neusploit.
+// Author:       Ahsan M.
+
+DeviceRegistryEvents
+| where Timestamp > ago(7d)
+| where RegistryKey startswith "HKEY_USERS"
+| where RegistryKey has_all ("Software", "Classes", "CLSID")
+| where RegistryKey has_any ("InProcServer32", "LocalServer32", "InprocHandler32")
+| where ActionType in ("RegistryValueSet", "RegistryKeyCreated")
+| where isnotempty(RegistryValueData)
+| where RegistryValueData has_any (".dll", ".exe")
+| where RegistryValueData !has "C:\\Windows\\system32"
+| where RegistryValueData !has "C:\\Program Files"
+| project Timestamp, DeviceId, DeviceName,
+          ActionType, RegistryKey, RegistryValueName,
+          RegistryValueData, InitiatingProcessFileName,
+          InitiatingProcessCommandLine
+| order by Timestamp desc
