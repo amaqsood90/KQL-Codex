@@ -1,0 +1,23 @@
+// Title:        Axios Supply Chain — RAT Persistence via MicrosoftUpdate Run Key
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1547.001 (Boot/Logon Autostart: Registry Run Keys / Startup Folder)
+// Data Sources: DeviceRegistryEvents
+// Description:  Detects creation of the "MicrosoftUpdate" Run key used by the Axios supply chain
+//               RAT for Windows persistence. The RAT writes system.bat under C:\ProgramData to
+//               HKCU or HKLM CurrentVersion\Run to survive reboots.
+// Author:       Ahsan M.
+
+DeviceRegistryEvents
+| where TimeGenerated > ago(30d)
+| where RegistryKey has_any (
+    @"Software\Microsoft\Windows\CurrentVersion\Run",
+    @"Software\Microsoft\Windows\CurrentVersion\RunOnce"
+)
+| where RegistryValueName =~ "MicrosoftUpdate"
+    or RegistryValueData has @"C:\ProgramData\system.bat"
+| project TimeGenerated, DeviceName, ActionType, RegistryKey,
+          RegistryValueName, RegistryValueData,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName, InitiatingProcessId
+| order by TimeGenerated desc
