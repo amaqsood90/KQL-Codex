@@ -1,0 +1,20 @@
+// Title:        Axios Supply Chain — C2 Network Connections (Sapphire Sleet / UNC1069)
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1071.001 (Application Layer Protocol: Web Protocols), T1571 (Non-Standard Port)
+// Data Sources: DeviceNetworkEvents
+// Description:  Detects outbound connections to C2 infrastructure used in the Axios npm supply chain
+//               attack (March 2026). Covers primary and backup C2 domains, hardcoded IPs, and
+//               non-standard port 8000 used for RAT beaconing. Attributed to Sapphire Sleet / UNC1069.
+// Author:       Ahsan M.
+
+let C2Domains = dynamic(["sfrclak.com", "callnrwise.com", "calltan.com"]);
+let C2IPs = dynamic(["142.11.206.73", "23.254.167.216"]);
+DeviceNetworkEvents
+| where TimeGenerated > ago(30d)
+| where RemoteUrl has_any (C2Domains)
+    or RemoteIP in (C2IPs)
+| project TimeGenerated, DeviceName, InitiatingProcessFileName,
+          InitiatingProcessCommandLine, RemoteUrl, RemoteIP, RemotePort,
+          InitiatingProcessAccountName, InitiatingProcessId
+| order by TimeGenerated desc

@@ -1,0 +1,28 @@
+// Title:        Axios Supply Chain — Malicious Payload Drop (WAVESHAPER / NukeSped RAT)
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1105 (Ingress Tool Transfer), T1036 (Masquerading)
+// Data Sources: DeviceFileEvents
+// Description:  Detects file creation events matching known artifacts from the Axios supply chain
+//               dropper: renamed PowerShell (wt.exe in ProgramData), VBScript/PowerShell stage
+//               payloads, plain-crypto-js setup.js, and SHA256 hashes of confirmed malicious files.
+// Author:       Ahsan M.
+
+let MaliciousHashes = dynamic([
+    "e10b1fa84f1d6481625f741b69892780140d4e0e7769e7491e5f4d894c2e0e09", // setup.js dropper
+    "617b67a8e1210e4fc87c92d1d1da45a2f311c08d26e89b12307cf583c900d101", // Windows PS RAT v1
+    "ed8560c1ac7ceb6983ba995124d5917dc1a00288912387a6389296637d5f815c", // Windows PS RAT v2
+    "f7d335205b8d7b20208fb3ef93ee6dc817905dc3ae0c10a0b164f4e7d07121cd", // system.bat v1
+    "e49c2732fb9861548208a78e72996b9c3c470b6b562576924bcc3a9fb75bf9ff"  // system.bat persistence
+]);
+DeviceFileEvents
+| where TimeGenerated > ago(30d)
+| where SHA256 in (MaliciousHashes)
+    or (FileName =~ "wt.exe" and FolderPath startswith @"C:\ProgramData")
+    or (FileName =~ "system.bat" and FolderPath startswith @"C:\ProgramData")
+    or FileName in~ ("6202033.ps1", "6202033.vbs")
+    or (FileName =~ "setup.js" and FolderPath has "plain-crypto-js")
+| project TimeGenerated, DeviceName, ActionType, FileName, FolderPath,
+          SHA256, InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName
+| order by TimeGenerated desc
