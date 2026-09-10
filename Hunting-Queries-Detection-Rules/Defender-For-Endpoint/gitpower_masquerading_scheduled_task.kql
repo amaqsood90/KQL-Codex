@@ -1,0 +1,22 @@
+// Title:        Operation GitPower — Scheduled Task Masquerading as System Components
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1053.005 (Scheduled Task/Job: Scheduled Task), T1036.005 (Masquerading: Match Legitimate Name or Location)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects scheduled task creation using names that imitate BitLocker, .NET Framework
+//               NGEN, or MATLAB components where the task action launches PowerShell. Kimsuky uses
+//               this naming, including the misspelled "BitLockor", for recurring payload retrieval.
+// Author:       Ahsan M.
+
+let LureNames = dynamic(["BitLockor", "BitLocker", "NGEN", "NgenTask", "MATLAB", ".NET Framework", "DotNet"]);
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where (FileName =~ "schtasks.exe" and ProcessCommandLine has "/create")
+    or (FileName in~ ("powershell.exe", "pwsh.exe")
+        and ProcessCommandLine has_any ("Register-ScheduledTask", "New-ScheduledTask"))
+| where ProcessCommandLine has_any (LureNames)
+| where ProcessCommandLine has_any ("powershell", "pwsh", ".ps1")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName, ProcessId
+| order by Timestamp desc

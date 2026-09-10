@@ -1,0 +1,23 @@
+// Title:        Operation GitPower — LNK-Triggered Padded PowerShell Loader
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1204.002 (User Execution: Malicious File), T1027 (Obfuscated Files or Information)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects PowerShell launched from Explorer with a command line padded by dozens of
+//               leading spaces or carrying a space-delimited decimal array payload. Kimsuky's
+//               Operation GitPower LNK files insert ~300 leading spaces to push the malicious
+//               portion out of view in the Windows shortcut properties dialog.
+// Author:       Ahsan M.
+
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where InitiatingProcessFileName =~ "explorer.exe"
+| where FileName in~ ("powershell.exe", "pwsh.exe")
+| extend LeadingSpaces = strlen(ProcessCommandLine) - strlen(trim_start(@"[\s]+", ProcessCommandLine))
+| where LeadingSpaces >= 50 or strlen(ProcessCommandLine) >= 1500
+| where ProcessCommandLine matches regex @"(\s\d{1,3}){40,}"
+    or ProcessCommandLine has_any ("-enc", "-EncodedCommand", "FromBase64String", "Invoke-Expression", "iex")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine,
+          LeadingSpaces, CommandLineLength = strlen(ProcessCommandLine),
+          InitiatingProcessFileName, InitiatingProcessCommandLine, ProcessId
+| order by Timestamp desc

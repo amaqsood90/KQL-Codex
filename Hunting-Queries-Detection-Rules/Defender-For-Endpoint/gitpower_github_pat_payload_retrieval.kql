@@ -1,0 +1,23 @@
+// Title:        Operation GitPower — GitHub PAT-Authenticated Payload Retrieval
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1102 (Web Service), T1105 (Ingress Tool Transfer), T1071.001 (Application Layer Protocol: Web Protocols)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects scripting hosts requesting raw GitHub content with an Authorization token or
+//               the vnd.github.v3.raw Accept header. Kimsuky stages second-stage payloads in private
+//               repositories authenticated with a hardcoded PAT, defeating domain-only blocking.
+//               Pastebin is used as the backup delivery channel.
+// Author:       Ahsan M.
+
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName in~ ("powershell.exe", "pwsh.exe", "curl.exe", "conhost.exe")
+| where ProcessCommandLine has_any ("Invoke-WebRequest", "Invoke-RestMethod", "iwr ", "irm ",
+                                    "curl", "WebClient", "HttpClient")
+| where ProcessCommandLine has_any ("api.github.com", "raw.githubusercontent.com",
+                                    "gist.githubusercontent.com", "pastebin.com")
+| where ProcessCommandLine has_any ("Authorization", "vnd.github", "ghp_", "github_pat_", "Bearer ")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName, ProcessId
+| order by Timestamp desc

@@ -1,0 +1,21 @@
+// Title:        Operation GitPower — PSReadLine History Deletion After Loader Execution
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1070.003 (Indicator Removal: Clear Command History)
+// Data Sources: DeviceFileEvents
+// Description:  Detects deletion of ConsoleHost_history.txt by a scripting host. Kimsuky's loader
+//               removes the PSReadLine history file once the second stage runs, stripping evidence
+//               of the decoded command line.
+// Author:       Ahsan M.
+
+DeviceFileEvents
+| where Timestamp > ago(30d)
+| where FileName =~ "ConsoleHost_history.txt"
+| where ActionType == "FileDeleted"
+| where InitiatingProcessFileName in~ ("powershell.exe", "pwsh.exe", "cmd.exe",
+                                       "wscript.exe", "cscript.exe", "mshta.exe")
+| project Timestamp, DeviceName, FolderPath, ActionType,
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName, InitiatingProcessAccountDomain,
+          InitiatingProcessId
+| order by Timestamp desc

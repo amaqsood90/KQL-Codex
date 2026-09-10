@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=flat-square&color=yellow"/>
 <img src="https://img.shields.io/github/last-commit/amaqsood90/KQL-Codex?style=flat-square&color=blue"/>
 <img src="https://img.shields.io/badge/Queries-50%2B-brightgreen?style=flat-square"/>
-<img src="https://img.shields.io/badge/Campaigns-7-orange?style=flat-square"/>
+<img src="https://img.shields.io/badge/Campaigns-8-orange?style=flat-square"/>
 <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square"/>
 
 <br/><br/>
@@ -152,6 +152,18 @@ North Korea-nexus UNC1069 hijacked the axios npm maintainer account and publishe
 
 </td>
 <td width="50%">
+
+### GitPower-2026
+**Kimsuky | LNK Espionage | GitHub PAT Staging**
+
+North Korea-nexus Kimsuky delivers ZIP-borne LNK files padded with ~300 leading spaces to hide the command from the shortcut properties dialog, then stages AsyncRAT from private GitHub repositories using PAT-authenticated requests that defeat domain-based blocking. Decoy documents are mass-produced with the OpenCode AI agent.
+
+**4 detections** covering the padded PowerShell loader, scheduled tasks impersonating system components, token-authenticated payload retrieval, and console history anti-forensics.
+
+`T1204.002` `T1027` `T1053.005` `T1036.005` `T1102` `T1105` `T1070.003`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/GitPower-2026/)
+
 </td>
 </tr>
 </table>
@@ -176,7 +188,8 @@ North Korea-nexus UNC1069 hijacked the axios npm maintainer account and publishe
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/White-Lock-2025/">White-Lock-2025</a> — White Lock ransomware · <code>T1486</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/">Tycoon2FA-2026</a> — AiTM PhaaS · Storm-1747 · <code>T1557</code> <code>T1566.002</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Neusploit-2026/">Neusploit-2026</a> — APT28 · CVE-2026-21509 · <code>T1203</code> <code>T1546.015</code> <code>T1102</code><br><br>
-&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/AxiosRAT-2026/">AxiosRAT-2026</a> — axios npm supply chain · Sapphire Sleet · <code>T1195.001</code> <code>T1105</code> <code>T1547.001</code>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/AxiosRAT-2026/">AxiosRAT-2026</a> — axios npm supply chain · Sapphire Sleet · <code>T1195.001</code> <code>T1105</code> <code>T1547.001</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/GitPower-2026/">GitPower-2026</a> — Kimsuky LNK espionage · GitHub PAT staging · <code>T1204.002</code> <code>T1027</code> <code>T1102</code>
 </p>
 
 </details>
