@@ -1,0 +1,23 @@
+// Title:        Mirage Kitten — NodeRabbit / PollCat Scheduled Task Persistence
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1053.005 (Scheduled Task/Job: Scheduled Task), T1036.005 (Masquerading: Match Legitimate Name or Location)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects scheduled tasks named MicrosoftEdgeUpdate, IntelDriverSupportUpdate, or
+//               NetSync_<user> whose action runs a Node binary, .js file, or the WSL launcher.vbs
+//               stub. NodeRabbit variant 3 fires daily at 10:00 and PollCat at 09:00, requesting
+//               SYSTEM with highest privileges.
+// Author:       Ahsan M.
+
+let TaskNames = dynamic(["MicrosoftEdgeUpdate", "IntelDriverSupportUpdate", "NetSync_"]);
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName =~ "schtasks.exe"
+| where ProcessCommandLine has "/create"
+| where ProcessCommandLine has_any (TaskNames)
+| where ProcessCommandLine has_any ("node.exe", "nodew.exe", "IntelDSA.exe", ".js", "launcher.vbs", "wsl")
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine,
+          RunAsSystem = ProcessCommandLine has "/ru SYSTEM",
+          InitiatingProcessFileName, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName, ProcessId
+| order by Timestamp desc

@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=flat-square&color=yellow"/>
 <img src="https://img.shields.io/github/last-commit/amaqsood90/KQL-Codex?style=flat-square&color=blue"/>
 <img src="https://img.shields.io/badge/Queries-50%2B-brightgreen?style=flat-square"/>
-<img src="https://img.shields.io/badge/Campaigns-8-orange?style=flat-square"/>
+<img src="https://img.shields.io/badge/Campaigns-9-orange?style=flat-square"/>
 <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square"/>
 
 <br/><br/>
@@ -166,6 +166,24 @@ North Korea-nexus Kimsuky delivers ZIP-borne LNK files padded with ~300 leading 
 
 </td>
 </tr>
+<tr>
+<td width="50%">
+
+### MirageKitten-2026
+**Nimbus Manticore / UNC1549 | Fake Job Assessments**
+
+Iran-nexus Mirage Kitten poses as recruiters to send engineers trojanized take-home coding tests hosted on S3. The NodeRabbit and PollCat backdoors ship as unpublished local npm dependencies, copy the Node runtime under Intel and Edge Update names, and persist through Git hooks so removing the package does not remove the implant.
+
+**4 detections** covering renamed Node implants, branded scheduled tasks, Git hook persistence, and C2 beaconing to known infrastructure.
+
+`T1195.002` `T1036.003` `T1036.005` `T1053.005` `T1546` `T1071.001` `T1041`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/MirageKitten-2026/)
+
+</td>
+<td width="50%">
+</td>
+</tr>
 </table>
 
 ---
@@ -189,7 +207,8 @@ North Korea-nexus Kimsuky delivers ZIP-borne LNK files padded with ~300 leading 
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Tycoon2FA-2026/">Tycoon2FA-2026</a> — AiTM PhaaS · Storm-1747 · <code>T1557</code> <code>T1566.002</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Neusploit-2026/">Neusploit-2026</a> — APT28 · CVE-2026-21509 · <code>T1203</code> <code>T1546.015</code> <code>T1102</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/AxiosRAT-2026/">AxiosRAT-2026</a> — axios npm supply chain · Sapphire Sleet · <code>T1195.001</code> <code>T1105</code> <code>T1547.001</code><br><br>
-&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/GitPower-2026/">GitPower-2026</a> — Kimsuky LNK espionage · GitHub PAT staging · <code>T1204.002</code> <code>T1027</code> <code>T1102</code>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/GitPower-2026/">GitPower-2026</a> — Kimsuky LNK espionage · GitHub PAT staging · <code>T1204.002</code> <code>T1027</code> <code>T1102</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/MirageKitten-2026/">MirageKitten-2026</a> — Nimbus Manticore · fake job assessments · <code>T1195.002</code> <code>T1546</code> <code>T1041</code>
 </p>
 
 </details>

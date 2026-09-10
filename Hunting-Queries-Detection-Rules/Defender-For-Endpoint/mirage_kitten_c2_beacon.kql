@@ -1,0 +1,28 @@
+// Title:        Mirage Kitten — NodeRabbit / PollCat C2 Beaconing
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1071.001 (Application Layer Protocol: Web Protocols), T1041 (Exfiltration Over C2 Channel)
+// Data Sources: DeviceNetworkEvents
+// Description:  Detects connections to known NodeRabbit and PollCat C2 hosts, or Node and Electron
+//               processes hitting the fixed implant API paths. NodeRabbit posts AES-256-GCM encrypted
+//               bodies to /api/rabbit/checkin and /sdk/v2/ready; PollCat polls /gate/fetch every two
+//               minutes with up to five seconds of jitter.
+// Author:       Ahsan M.
+
+let C2Domains = dynamic([
+    "plugplay.azurewebsites.net", "rgbteller.azurewebsites.net", "wslwebui.azurewebsites.net",
+    "visitfinancedentists.com", "healthcomfsdpower.com",
+    "kyrasey-f8hfexa5cqamh7fk.westeurope-01.azurewebsites.net",
+    "sahi-finance.com", "gamebarappinformation.azurewebsites.net", "gamebarapp.azurewebsites.net"]);
+let C2Paths = dynamic([
+    "/api/rabbit/checkin", "/api/rabbit/task", "/sdk/v2/ready",
+    "/beacon", "/gate/hello", "/gate/fetch"]);
+DeviceNetworkEvents
+| where Timestamp > ago(30d)
+| where RemoteUrl has_any (C2Domains)
+    or (InitiatingProcessFileName in~ ("node.exe", "nodew.exe", "IntelDSA.exe", "electron.exe")
+        and RemoteUrl has_any (C2Paths))
+| project Timestamp, DeviceName, InitiatingProcessFileName, InitiatingProcessFolderPath,
+          InitiatingProcessCommandLine, RemoteUrl, RemoteIP, RemotePort,
+          InitiatingProcessAccountName, InitiatingProcessId
+| order by Timestamp desc

@@ -1,0 +1,22 @@
+// Title:        Mirage Kitten — Git Hook Persistence on Developer Endpoints
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1546 (Event Triggered Execution), T1195.002 (Supply Chain Compromise: Compromise Software Supply Chain)
+// Data Sources: DeviceFileEvents
+// Description:  Hunts for writes to Git hook scripts by any process other than Git itself. NodeRabbit
+//               appends a block marked "# shepherd-persist;" to .git/hooks/post-merge and
+//               post-checkout so the implant re-executes whenever the developer pulls or switches
+//               branches, surviving removal of the original package.
+// Author:       Ahsan M.
+
+DeviceFileEvents
+| where Timestamp > ago(30d)
+| where FolderPath has @"\.git\hooks"
+| where FileName in~ ("post-merge", "post-checkout", "post-commit", "pre-push")
+| where ActionType in ("FileCreated", "FileModified", "FileRenamed")
+| where InitiatingProcessFileName !in~ ("git.exe", "git-lfs.exe")
+| project Timestamp, DeviceName, FolderPath, FileName, ActionType,
+          InitiatingProcessFileName, InitiatingProcessFolderPath,
+          InitiatingProcessCommandLine, InitiatingProcessAccountName,
+          InitiatingProcessAccountDomain
+| order by Timestamp desc

@@ -1,0 +1,23 @@
+// Title:        Mirage Kitten — NodeRabbit Renamed Node.js Implant Execution
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1036.003 (Masquerading: Rename System Utilities), T1195.002 (Supply Chain Compromise: Compromise Software Supply Chain)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects a copied Node.js runtime renamed to nodew.exe or IntelDSA.exe, or a Node
+//               process launched from a node_modules cache directory or Edge Update / Intel DSA
+//               masquerade path. NodeRabbit copies node.exe, flips the PE subsystem to GUI so no
+//               console appears, and runs node_modules\.cache\.320697f1\index.js detached.
+// Author:       Ahsan M.
+
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName in~ ("node.exe", "nodew.exe", "IntelDSA.exe")
+| where (FileName in~ ("nodew.exe", "IntelDSA.exe")
+         and (ProcessVersionInfoOriginalFileName =~ "node.exe"
+              or ProcessVersionInfoProductName has "Node.js"))
+    or ProcessCommandLine has @"node_modules\.cache"
+    or FolderPath has_any (@"\Microsoft\EdgeUpdate\", @"\Intel\DSA\", @"\Microsoft\Network\")
+| project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine,
+          ProcessVersionInfoOriginalFileName, InitiatingProcessFileName,
+          InitiatingProcessCommandLine, ProcessId
+| order by Timestamp desc
