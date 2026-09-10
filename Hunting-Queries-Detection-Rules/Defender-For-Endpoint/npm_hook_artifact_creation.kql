@@ -12,5 +12,5 @@ DeviceFileEvents
 | where tolower(FileName) in ("bundle.js", "install.js", "prepare.js")
    or tolower(FolderPath) has_any ("\\node_modules\\", "/node_modules/")
 | where InitiatingProcessFileName in~ ("npm", "node")
-| project Timestamp, DeviceName, AccountName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
+| project Timestamp, DeviceName, AccountName = InitiatingProcessAccountName, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessCommandLine
 | order by Timestamp desc

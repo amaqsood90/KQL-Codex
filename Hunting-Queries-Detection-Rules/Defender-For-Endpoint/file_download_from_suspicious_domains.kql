@@ -11,4 +11,4 @@
 DeviceFileEvents
 | where InitiatingProcessFileName in ("powershell.exe","cmd.exe","bitsadmin.exe","mshta.exe")
 | where FileOriginUrl has_any (".ru",".cn","raw.githubusercontent.com","pastebin.com")
-| project Timestamp, DeviceName, AccountName, FileName, FileOriginUrl
+| project Timestamp, DeviceName, AccountName = InitiatingProcessAccountName, FileName, FileOriginUrl

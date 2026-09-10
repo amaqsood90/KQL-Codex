@@ -9,5 +9,5 @@
 
 DeviceFileEvents
 | where FileName endswith ".fbin" or FileName == "c0ntact.txt"
-| summarize FirstSeen=min(Timestamp), LastSeen=max(Timestamp), Count=count() by DeviceName, AccountName, InitiatingProcessFileName, FileName
+| summarize FirstSeen=min(Timestamp), LastSeen=max(Timestamp), Count=count() by DeviceName, AccountName = InitiatingProcessAccountName, InitiatingProcessFileName, FileName
 | order by Count desc
