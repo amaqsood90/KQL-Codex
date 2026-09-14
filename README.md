@@ -188,7 +188,7 @@ Iran-nexus Mirage Kitten poses as recruiters to send engineers trojanized take-h
 
 Three chained JFrog Artifactory auth flaws let unauthenticated actors mint admin tokens, deploy malicious Groovy plugins for code execution, and drop a Rust backdoor on the binary repository that fronts every build in the estate. Persistence survives patching — plugins and stolen join keys outlive the upgrade.
 
-**4 detections** covering token-endpoint exploitation at the WAF, Artifactory JVM child processes, plugin and SSH key persistence, and C2 egress from build hosts.
+**4 behavioural detections** covering token-endpoint exploitation at the WAF, Artifactory JVM child processes, plugin and SSH key persistence, and C2 egress from build hosts — plus **4 IOC-driven queries** reading Wiz's 34 published indicators from a version-controlled CSV via `externaldata`.
 
 `T1190` `T1550.001` `T1059.004` `T1105` `T1505` `T1098.004` `T1071.001`
 
@@ -239,6 +239,15 @@ Three chained JFrog Artifactory auth flaws let unauthenticated actors mint admin
 
 <details>
 <summary>📁 <b>Defender-For-Identity/AD/</b> &nbsp;·&nbsp; Kerberos attacks, DCSync, AD enumeration</summary>
+</details>
+
+<details>
+<summary>📂 <b>IOCs/</b> &nbsp;·&nbsp; Version-controlled indicator CSVs, read by <code>_ioc_</code> queries at run time via <code>externaldata</code></summary>
+
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/IOCs/Artifactory-2026/">Artifactory-2026</a> — 34 indicators · ip · domain · url · sha1 · filepath · account
+</p>
+
 </details>
 
 <details>

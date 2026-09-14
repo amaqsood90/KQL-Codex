@@ -1,0 +1,36 @@
+// Title:        Artifactory Under Attack — Payload Download and C2 Egress (IOC Match)
+// Product:      Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1105 (Ingress Tool Transfer), T1071.001 (Application Layer Protocol: Web Protocols)
+// Data Sources: DeviceNetworkEvents
+// Description:  Matches outbound connections from MDE-onboarded hosts against the payload staging host
+//               log.gitclone.org, the second-stage server 3.88.162.79, the C2 server 64.207.232.6 and the
+//               actor source IPs Wiz published for the Artifactory campaign. A host reaching any of these is
+//               post-exploitation, not probing. Indicators are read at run time from the
+//               IOCs/Artifactory-2026 CSV via externaldata. Sentinel / Log Analytics only.
+// Author:       Ahsan M.
+
+let IOCs = materialize(externaldata(Indicator:string, Type:string, Context:string, Source:string, DateAdded:string)
+    [@"https://raw.githubusercontent.com/amaqsood90/KQL-Codex/main/Hunting-Queries-Detection-Rules/IOCs/Artifactory-2026/artifactory_2026_iocs.csv"]
+    with (format="csv", ignoreFirstRecord=true));
+let IPIndicators = IOCs | where Type == "ip" | project Indicator, Context;
+let DomainIndicators = IOCs | where Type == "domain" | project Indicator, Context;
+let Connections = DeviceNetworkEvents
+    | where Timestamp > ago(30d)
+    | where ActionType in ("ConnectionSuccess", "ConnectionAttempt", "ConnectionFound", "ConnectionFailed")
+    // DeviceNetworkEvents has no AccountName column
+    | extend AccountName = InitiatingProcessAccountName
+    // RemoteUrl is usually a bare hostname; strip any scheme and port so it compares cleanly to a domain IOC
+    | extend RemoteHost = extract(@"^(?:[a-z]+://)?([^:/]+)", 1, tolower(RemoteUrl));
+let IPHits = Connections
+    | join kind=inner (IPIndicators) on $left.RemoteIP == $right.Indicator
+    | extend MatchedOn = "ip";
+let DomainHits = Connections
+    | where isnotempty(RemoteHost)
+    | join kind=inner (DomainIndicators) on $left.RemoteHost == $right.Indicator
+    | extend MatchedOn = "domain";
+union IPHits, DomainHits
+| project Timestamp, DeviceName, AccountName, MatchedOn, MatchedIndicator = Indicator, IndicatorContext = Context,
+          RemoteIP, RemotePort, RemoteUrl, ActionType,
+          InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine
+| order by Timestamp desc

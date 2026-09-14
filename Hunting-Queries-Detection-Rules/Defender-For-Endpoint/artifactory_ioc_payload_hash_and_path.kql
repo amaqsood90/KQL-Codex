@@ -1,0 +1,47 @@
+// Title:        Artifactory Under Attack — Second-Stage Payload Hash and Drop Path (IOC Match)
+// Product:      Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1105 (Ingress Tool Transfer), T1564.001 (Hide Artifacts: Hidden Files and Directories)
+// Data Sources: DeviceFileEvents, DeviceProcessEvents
+// Description:  Matches file writes and process executions against the SHA1 of the second-stage payload Wiz
+//               recovered from /tmp/.z on compromised Artifactory hosts, and against the /tmp/.z drop path
+//               itself. A dot-prefixed single-letter file in /tmp is hidden from a plain ls and has no
+//               legitimate reason to exist or execute on a build server. Hash and path are read from the
+//               IOCs/Artifactory-2026 CSV via externaldata. Sentinel / Log Analytics only.
+// Author:       Ahsan M.
+
+let IOCs = materialize(externaldata(Indicator:string, Type:string, Context:string, Source:string, DateAdded:string)
+    [@"https://raw.githubusercontent.com/amaqsood90/KQL-Codex/main/Hunting-Queries-Detection-Rules/IOCs/Artifactory-2026/artifactory_2026_iocs.csv"]
+    with (format="csv", ignoreFirstRecord=true));
+let PayloadHashes = IOCs | where Type in ("sha1", "sha256", "md5") | project Indicator = tolower(Indicator);
+let PayloadPaths = IOCs | where Type == "filepath" | project Indicator;
+let FileHits = DeviceFileEvents
+    | where Timestamp > ago(30d)
+    | where ActionType in ("FileCreated", "FileModified", "FileRenamed")
+    // DeviceFileEvents has no AccountName column
+    | extend AccountName = InitiatingProcessAccountName
+    // FolderPath may or may not already include the file name depending on sensor version
+    | extend FullPath = iff(FolderPath endswith FileName, FolderPath, strcat(FolderPath, "/", FileName))
+    | extend HashKey = tolower(SHA1)
+    | where HashKey in (PayloadHashes) or FullPath in (PayloadPaths)
+    | extend EventType = "FileEvent", ExecutedCommandLine = ""
+    | project Timestamp, DeviceName, AccountName, EventType, ActionType, FullPath, HashKey,
+              InitiatingProcessFileName, InitiatingProcessCommandLine, ExecutedCommandLine;
+let ProcessHits = DeviceProcessEvents
+    | where Timestamp > ago(30d)
+    // FolderPath on DeviceProcessEvents is the full path of the executable
+    | extend FullPath = FolderPath, HashKey = tolower(SHA1)
+    | where HashKey in (PayloadHashes) or FullPath in (PayloadPaths)
+    | extend EventType = "ProcessCreated", ExecutedCommandLine = ProcessCommandLine
+    | project Timestamp, DeviceName, AccountName, EventType, ActionType, FullPath, HashKey,
+              InitiatingProcessFileName, InitiatingProcessCommandLine, ExecutedCommandLine;
+union FileHits, ProcessHits
+| extend MatchKey = iff(HashKey in (PayloadHashes), HashKey, FullPath)
+| join kind=inner (IOCs
+    | where Type in ("sha1", "sha256", "md5", "filepath")
+    | project MatchKey = iff(Type == "filepath", Indicator, tolower(Indicator)), MatchedOn = Type, IndicatorContext = Context)
+    on MatchKey
+| project Timestamp, DeviceName, AccountName, EventType, ActionType, MatchedOn, MatchedIndicator = MatchKey,
+          IndicatorContext, FullPath, HashKey, InitiatingProcessFileName, InitiatingProcessCommandLine,
+          ExecutedCommandLine
+| order by Timestamp desc

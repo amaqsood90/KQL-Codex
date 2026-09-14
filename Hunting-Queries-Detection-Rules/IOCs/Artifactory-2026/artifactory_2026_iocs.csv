@@ -1,0 +1,35 @@
+Indicator,Type,Context,Source,DateAdded
+log.gitclone.org,domain,Payload download host after CVE-2026-42018/42016 exploitation,Wiz Research,2026-09-14
+http://log.gitclone.org:45678/smtp,url,Payload download URL after CVE-2026-42018/42016 exploitation,Wiz Research,2026-09-14
+http://3.88.162.79:36789/smtp,url,Second-stage payload URL after CVE-2026-42018/42016 exploitation,Wiz Research,2026-09-14
+3.88.162.79,ip,Second-stage payload host (port 36789),Wiz Research,2026-09-14
+64.207.232.6,ip,C2 server (port 8443),Wiz Research,2026-09-14
+149.102.229.150,ip,Exploitation source - CVE-2026-42018/42016,Wiz Research,2026-09-14
+186.247.79.240,ip,Exploitation source - CVE-2026-42018,Wiz Research,2026-09-14
+182.62.201.69,ip,Exploitation source - CVE-2026-42018,Wiz Research,2026-09-14
+146.19.216.120,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+185.190.58.172,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+45.61.176.88,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+223.144.227.110,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+129.121.56.234,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+16.54.250.190,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+105.188.75.16,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+103.124.165.42,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+176.88.121.152,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+155.254.120.23,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+220.246.124.92,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+15.157.64.113,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+104.28.251.139,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+137.184.111.69,ip,Exploitation source - CVE-2026-82329,Wiz Research,2026-09-14
+513a907b69edffc3cb77a494da395178d21ef9bd,sha1,Second-stage payload recovered from /tmp/.z,Wiz Research,2026-09-14
+/tmp/.z,filepath,Second-stage payload drop location,Wiz Research,2026-09-14
+jfrog-distribution,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+backup-service,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+repo-service,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+jfrog-insight,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+jfrog-mission-control,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+jfrog-pipeline,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+migration-tool,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+ldap_admin,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+ldap_administrator,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14
+0xterror,account,Persistent admin account created via Artifactory users API,Wiz Research,2026-09-14

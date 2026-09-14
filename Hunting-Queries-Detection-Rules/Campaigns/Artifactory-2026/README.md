@@ -17,6 +17,15 @@ Between 15 August and 8 September 2026, multiple unattributed actors chained thr
 - **MDE:** [artifactory_groovy_plugin_persistence.kql](../../Defender-For-Endpoint/artifactory_groovy_plugin_persistence.kql) — Groovy plugin drops, SSH key writes, systemd/cron units, and account tamper from the Artifactory tree `T1505` `T1098.004` `T1543.002`
 - **MDE:** [artifactory_backdoor_c2_egress.kql](../../Defender-For-Endpoint/artifactory_backdoor_c2_egress.kql) — Non-JFrog processes on JFrog hosts beaconing to public IPs from world-writable paths `T1071.001` `T1041`
 
+## IOC Queries
+
+These read the 34 indicators Wiz published from [IOCs/Artifactory-2026/artifactory_2026_iocs.csv](../../IOCs/Artifactory-2026/artifactory_2026_iocs.csv) at run time via `externaldata`, so updating the CSV on `main` updates every deployed rule. Sentinel / Log Analytics only — see the [IOCs README](../../IOCs/README.md) for the Watchlist and Defender XDR alternatives.
+
+- **Sentinel:** [artifactory_ioc_exploitation_source_ips.kql](../../Network-Logs/artifactory_ioc_exploitation_source_ips.kql) — Inbound requests from the 17 exploitation source IPs, payload host, or C2 server `T1190`
+- **Sentinel:** [artifactory_ioc_backdoor_account_creation.kql](../../Network-Logs/artifactory_ioc_backdoor_account_creation.kql) — PUT to the users API creating one of the 10 named backdoor accounts or a `svc_`/`Nxploited_`/`labadmin_` generated name `T1136.001` `T1098`
+- **Sentinel:** [artifactory_ioc_c2_payload_egress.kql](../../Defender-For-Endpoint/artifactory_ioc_c2_payload_egress.kql) — Outbound connections to `log.gitclone.org`, the second-stage server, C2, or any actor IP `T1105` `T1071.001`
+- **Sentinel:** [artifactory_ioc_payload_hash_and_path.kql](../../Defender-For-Endpoint/artifactory_ioc_payload_hash_and_path.kql) — File writes or executions matching the payload SHA1 or the `/tmp/.z` drop path `T1105` `T1564.001`
+
 ## MITRE ATT&CK
 
 | Technique | Name | Covered |
@@ -28,9 +37,11 @@ Between 15 August and 8 September 2026, multiple unattributed actors chained thr
 | T1505 | Server Software Component (Groovy user plugin) | Query 3 |
 | T1098.004 | Account Manipulation: SSH Authorized Keys | Query 3 |
 | T1543.002 | Create or Modify System Process: Systemd Service | Query 3 |
-| T1136.001 | Create Account: Local Account | Context |
-| T1071.001 | Application Layer Protocol: Web Protocols | Query 4 |
+| T1136.001 | Create Account: Local Account | IOC Query 2 |
+| T1098 | Account Manipulation | IOC Query 2 |
+| T1071.001 | Application Layer Protocol: Web Protocols | Query 4, IOC Query 3 |
 | T1041 | Exfiltration Over C2 Channel | Query 4 |
+| T1564.001 | Hide Artifacts: Hidden Files and Directories | IOC Query 4 |
 | T1552 | Unsecured Credentials (join key, config theft) | Context |
 
 ## Key IOCs

@@ -1,0 +1,31 @@
+// Title:        Artifactory Under Attack — Backdoor Admin Account Creation (IOC Match)
+// Product:      Sentinel
+// Query Type:   Detection Rule
+// ATT&CK:       T1136.001 (Create Account: Local Account), T1098 (Account Manipulation)
+// Data Sources: CommonSecurityLog
+// Description:  Detects creation of the persistent Artifactory admin accounts Wiz observed across compromised
+//               instances. Post-exploitation, actors PUT to /api/security/users/<name> or
+//               /access/api/ui/users/<name> using names chosen to blend in with JFrog service identities.
+//               The ten fixed names are read from the IOCs/Artifactory-2026 CSV via externaldata. The three
+//               generated-name patterns (svc_, Nxploited_, labadmin_ plus random suffix) are regexes and are
+//               matched inline because KQL requires a constant pattern. Sentinel / Log Analytics only.
+// Author:       Ahsan M.
+
+let IOCs = materialize(externaldata(Indicator:string, Type:string, Context:string, Source:string, DateAdded:string)
+    [@"https://raw.githubusercontent.com/amaqsood90/KQL-Codex/main/Hunting-Queries-Detection-Rules/IOCs/Artifactory-2026/artifactory_2026_iocs.csv"]
+    with (format="csv", ignoreFirstRecord=true));
+let BackdoorAccounts = IOCs | where Type == "account" | project Indicator;
+CommonSecurityLog
+| where TimeGenerated > ago(30d)
+| where RequestMethod in~ ("PUT", "POST")
+| extend UrlPath = tostring(split(RequestURL, "?")[0])
+| where UrlPath has_any ("/api/security/users/", "/access/api/ui/users/")
+// The account name is the final path segment
+| extend TargetAccount = tostring(split(UrlPath, "/")[-1])
+| where isnotempty(TargetAccount)
+| extend KnownBackdoorName = TargetAccount in~ (BackdoorAccounts)
+| extend GeneratedNamePattern = TargetAccount matches regex @"^(svc_[a-zA-Z0-9]{8}|Nxploited_[a-zA-Z0-9]{3}|labadmin_[a-zA-Z0-9]{10})$"
+| where KnownBackdoorName or GeneratedNamePattern
+| project TimeGenerated, SourceIP, DestinationHostName, DestinationIP, RequestMethod, UrlPath,
+          TargetAccount, KnownBackdoorName, GeneratedNamePattern, RequestClientApplication
+| order by TimeGenerated desc
