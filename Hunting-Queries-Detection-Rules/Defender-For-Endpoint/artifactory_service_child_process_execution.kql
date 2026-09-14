@@ -1,0 +1,39 @@
+// Title:        Artifactory Under Attack — Groovy Plugin Command Execution and Payload Staging
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1059.004 (Command and Scripting Interpreter: Unix Shell), T1105 (Ingress Tool Transfer)
+// Data Sources: DeviceProcessEvents
+// Description:  Detects the JFrog Artifactory or Access service process spawning a shell, interpreter, or
+//               downloader child. After minting an admin token the actors deploy a malicious Groovy user
+//               plugin and drive ad-hoc commands through its plugin endpoint, so every command runs as a
+//               child of the Artifactory JVM. Second-stage payloads are written to world-writable paths —
+//               /dev/shm, /tmp, /var/tmp — then chmod'd and executed. Artifactory does fork a small number
+//               of helper scripts at startup, so this filters to children that fetch remote content, stage
+//               in world-writable paths, set an exec bit, or open a reverse shell.
+// Author:       Ahsan M.
+
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where (InitiatingProcessFolderPath has_any ("/opt/jfrog/", "/jfrog/artifactory/", "/var/opt/jfrog/",
+                                              "/jfrog/access/", @"\JFrog\Artifactory\"))
+     or (InitiatingProcessCommandLine has_any ("artifactory.jar", "access.jar", "jfrog-access",
+                                               "/opt/jfrog/artifactory", "org.artifactory"))
+| where FileName in~ ("sh", "bash", "dash", "zsh", "ksh", "python", "python3", "perl", "ruby", "php",
+                      "curl", "wget", "nc", "ncat", "netcat", "socat", "busybox", "chmod", "base64",
+                      "cmd.exe", "powershell.exe", "pwsh.exe", "certutil.exe", "bitsadmin.exe")
+| extend StagingPath = ProcessCommandLine has_any ("/dev/shm", "/var/tmp", "/tmp/", "/dev/mqueue")
+| extend RemoteFetch = ProcessCommandLine has_any ("http://", "https://", "curl ", "wget ",
+                                                    "Invoke-WebRequest", "Invoke-RestMethod")
+| extend ShellRedirect = ProcessCommandLine has_any ("/dev/tcp/", "/dev/udp/", "bash -i", "sh -i",
+                                                     "-e /bin/sh", "-e /bin/bash", "mkfifo",
+                                                     "0>&1", "0<&1", "pty.spawn")
+| extend ExecBitSet = ProcessCommandLine has_any ("chmod +x", "chmod 777", "chmod 755", "chmod u+x")
+| extend KeyTheft = ProcessCommandLine has_any ("join.key", "master.key", "access.config",
+                                                    "artifactory.config", "bootstrap.creds",
+                                                    "authorized_keys")
+| where StagingPath or RemoteFetch or ShellRedirect or ExecBitSet or KeyTheft
+| project Timestamp, DeviceName, AccountName, FileName, FolderPath, ProcessCommandLine,
+          StagingPath, RemoteFetch, ShellRedirect, ExecBitSet, KeyTheft,
+          InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
+          InitiatingProcessAccountName, InitiatingProcessId, ProcessId
+| order by Timestamp desc

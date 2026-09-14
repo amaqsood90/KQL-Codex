@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/github/stars/amaqsood90/KQL-Codex?style=flat-square&color=yellow"/>
 <img src="https://img.shields.io/github/last-commit/amaqsood90/KQL-Codex?style=flat-square&color=blue"/>
 <img src="https://img.shields.io/badge/Queries-50%2B-brightgreen?style=flat-square"/>
-<img src="https://img.shields.io/badge/Campaigns-9-orange?style=flat-square"/>
+<img src="https://img.shields.io/badge/Campaigns-10-orange?style=flat-square"/>
 <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square"/>
 
 <br/><br/>
@@ -182,6 +182,18 @@ Iran-nexus Mirage Kitten poses as recruiters to send engineers trojanized take-h
 
 </td>
 <td width="50%">
+
+### Artifactory-2026
+**CVE-2026-82329 / 42018 / 42016 | KEV | Multi-Actor**
+
+Three chained JFrog Artifactory auth flaws let unauthenticated actors mint admin tokens, deploy malicious Groovy plugins for code execution, and drop a Rust backdoor on the binary repository that fronts every build in the estate. Persistence survives patching — plugins and stolen join keys outlive the upgrade.
+
+**4 detections** covering token-endpoint exploitation at the WAF, Artifactory JVM child processes, plugin and SSH key persistence, and C2 egress from build hosts.
+
+`T1190` `T1550.001` `T1059.004` `T1105` `T1505` `T1098.004` `T1071.001`
+
+[View Campaign](Hunting-Queries-Detection-Rules/Campaigns/Artifactory-2026/)
+
 </td>
 </tr>
 </table>
@@ -208,7 +220,8 @@ Iran-nexus Mirage Kitten poses as recruiters to send engineers trojanized take-h
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Neusploit-2026/">Neusploit-2026</a> — APT28 · CVE-2026-21509 · <code>T1203</code> <code>T1546.015</code> <code>T1102</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/AxiosRAT-2026/">AxiosRAT-2026</a> — axios npm supply chain · Sapphire Sleet · <code>T1195.001</code> <code>T1105</code> <code>T1547.001</code><br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/GitPower-2026/">GitPower-2026</a> — Kimsuky LNK espionage · GitHub PAT staging · <code>T1204.002</code> <code>T1027</code> <code>T1102</code><br><br>
-&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/MirageKitten-2026/">MirageKitten-2026</a> — Nimbus Manticore · fake job assessments · <code>T1195.002</code> <code>T1546</code> <code>T1041</code>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/MirageKitten-2026/">MirageKitten-2026</a> — Nimbus Manticore · fake job assessments · <code>T1195.002</code> <code>T1546</code> <code>T1041</code><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;• <a href="Hunting-Queries-Detection-Rules/Campaigns/Artifactory-2026/">Artifactory-2026</a> — JFrog Artifactory auth bypass chain · KEV · <code>T1190</code> <code>T1505</code> <code>T1071.001</code>
 </p>
 
 </details>

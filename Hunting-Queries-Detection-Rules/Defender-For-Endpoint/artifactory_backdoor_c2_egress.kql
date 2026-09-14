@@ -1,0 +1,53 @@
+// Title:        Artifactory Under Attack — Rust Backdoor C2 Egress from Build Infrastructure
+// Product:      MDE
+// Query Type:   Detection Rule
+// ATT&CK:       T1071.001 (Application Layer Protocol: Web Protocols), T1041 (Exfiltration Over C2 Channel)
+// Data Sources: DeviceNetworkEvents, DeviceProcessEvents
+// Description:  Detects outbound C2 from a host running the JFrog stack where the connecting process is not
+//               part of that stack. Across multiple intrusions the actors dropped a custom Rust backdoor
+//               with C2 capability alongside stolen Artifactory config and cluster join keys, so egress is
+//               both beaconing and exfiltration. This is the behavioural companion to the IOC-driven
+//               artifactory_ioc_c2_payload_egress.kql: it scopes to hosts where the JFrog binaries run,
+//               excludes the JFrog stack's own egress, and surfaces connections from binaries executing out
+//               of world-writable paths or from interpreters and netcat-class tools that have no business
+//               making external connections from an artifact repository.
+// Author:       Ahsan M.
+
+// Scope to devices where the JFrog stack actually runs — no watchlist required
+let ArtifactoryHosts = DeviceProcessEvents
+    | where Timestamp > ago(30d)
+    | where (FolderPath has_any ("/opt/jfrog/", "/jfrog/artifactory/", "/var/opt/jfrog/"))
+         or (InitiatingProcessFolderPath has_any ("/opt/jfrog/", "/jfrog/artifactory/", "/var/opt/jfrog/"))
+         or (ProcessCommandLine has_any ("artifactory.jar", "access.jar", "org.artifactory"))
+    | distinct DeviceId;
+DeviceNetworkEvents
+| where Timestamp > ago(30d)
+| where DeviceId in (ArtifactoryHosts)
+| where ActionType in ("ConnectionSuccess", "ConnectionAttempt", "ConnectionFound")
+// DeviceNetworkEvents has no AccountName column
+| extend AccountName = InitiatingProcessAccountName
+// Exclude the JFrog stack's own legitimate egress (remote repo proxying, license checks)
+| where InitiatingProcessFolderPath !has "/opt/jfrog/"
+    and InitiatingProcessFolderPath !has "/jfrog/artifactory/"
+    and InitiatingProcessFolderPath !has "/var/opt/jfrog/"
+| extend RunsFromWorldWritable = InitiatingProcessFolderPath has_any ("/dev/shm", "/var/tmp", "/tmp/",
+                                                                      "/dev/mqueue")
+| extend SuspiciousTool = InitiatingProcessFileName in~ ("curl", "wget", "nc", "ncat", "netcat", "socat",
+                                                         "python", "python3", "perl", "ruby", "bash",
+                                                         "sh", "openssl", "ssh")
+| where RunsFromWorldWritable or SuspiciousTool
+// ipv4_is_private returns null for IPv6 — compare to false so only confirmed public IPv4 is kept
+| where ipv4_is_private(RemoteIP) == false
+| summarize Connections = count(), DistinctPorts = dcount(RemotePort),
+            Ports = make_set(RemotePort, 10),
+            SampleUrls = make_set(RemoteUrl, 5),
+            FirstSeen = min(Timestamp), LastSeen = max(Timestamp)
+        by DeviceName, RemoteIP, AccountName, InitiatingProcessFileName,
+           InitiatingProcessFolderPath, InitiatingProcessCommandLine
+| extend WindowHours = round((LastSeen - FirstSeen) / 1h, 1)
+// Long window with steady volume on one remote IP is the beacon shape
+| extend AvgConnectionsPerHour = iff(WindowHours > 0, round(Connections / WindowHours, 2), todouble(Connections))
+| project FirstSeen, LastSeen, WindowHours, DeviceName, RemoteIP, Ports, DistinctPorts,
+          Connections, AvgConnectionsPerHour, AccountName, InitiatingProcessFileName,
+          InitiatingProcessFolderPath, InitiatingProcessCommandLine, SampleUrls
+| order by Connections desc

@@ -1,0 +1,48 @@
+// Title:        Artifactory Under Attack — Groovy Plugin, SSH Key and Backdoor Persistence
+// Product:      MDE
+// Query Type:   Threat Hunting
+// ATT&CK:       T1505 (Server Software Component), T1098.004 (Account Manipulation: SSH Authorized Keys), T1543.002 (Create or Modify System Process: Systemd Service)
+// Data Sources: DeviceFileEvents
+// Description:  Hunts the persistence Wiz observed surviving patching on compromised Artifactory hosts. Any
+//               file ending .groovy under $JFROG_HOME/artifactory/var/etc/artifactory/plugins is loaded as
+//               a user plugin at startup and an in-place upgrade does not remove it, so a plugin dropped in
+//               August still executes on a fully patched September build. The same actors created admin
+//               accounts named to blend with JFrog service identities — jfrog-distribution, jfrog-insight,
+//               jfrog-mission-control, jfrog-pipeline, repo-service, backup-service, migration-tool,
+//               ldap_admin, ldap_administrator and 0xterror — staged Rust backdoors in world-writable paths,
+//               and wrote systemd and cron units from the Artifactory process tree. Patching alone does not
+//               evict any of this.
+// Author:       Ahsan M.
+
+DeviceFileEvents
+| where Timestamp > ago(30d)
+| where ActionType in ("FileCreated", "FileModified", "FileRenamed")
+// DeviceFileEvents has no AccountName column — the initiating process account is the actor
+| extend AccountName = InitiatingProcessAccountName
+| extend ArtifactoryProcess = (InitiatingProcessFolderPath has_any ("/opt/jfrog/", "/jfrog/artifactory/",
+                                                                    "/var/opt/jfrog/", "/jfrog/access/",
+                                                                    @"\JFrog\Artifactory\"))
+                           or (InitiatingProcessCommandLine has_any ("artifactory.jar", "access.jar",
+                                                                     "jfrog-access", "/opt/jfrog/artifactory"))
+| extend BackdoorAccount = FolderPath has_any ("jfrog-distribution", "jfrog-insight", "jfrog-mission-control",
+                                               "jfrog-pipeline", "repo-service", "backup-service",
+                                               "migration-tool", "ldap_admin", "ldap_administrator", "0xterror")
+| extend Technique = case(
+      (FolderPath has "etc/artifactory/plugins" and FileName endswith ".groovy"),
+          "Groovy user plugin written to Artifactory plugins dir — loaded at startup, survives upgrade",
+      (FileName =~ "authorized_keys" and (ArtifactoryProcess or BackdoorAccount)),
+          "SSH authorized_keys written by Artifactory tree or on attacker-named account",
+      (ArtifactoryProcess and FolderPath has_any ("/dev/shm", "/var/tmp", "/dev/mqueue")),
+          "Second-stage payload staged in world-writable path by Artifactory process",
+      (ArtifactoryProcess and FolderPath has_any ("/etc/systemd/system", "/lib/systemd/system",
+                                                  "/usr/lib/systemd/system", "/etc/cron.d",
+                                                  "/etc/crontab", "/etc/rc.local", "/etc/init.d")),
+          "Service or cron persistence written by Artifactory process",
+      (ArtifactoryProcess and FolderPath has_any ("/etc/passwd", "/etc/shadow", "/etc/sudoers")),
+          "Local account or sudo tamper by Artifactory process",
+      "")
+| where isnotempty(Technique)
+| project Timestamp, DeviceName, Technique, ActionType, FolderPath, FileName, SHA256, AccountName,
+          InitiatingProcessFileName, InitiatingProcessFolderPath, InitiatingProcessCommandLine,
+          InitiatingProcessId
+| order by Timestamp desc
