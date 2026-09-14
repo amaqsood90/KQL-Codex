@@ -14,6 +14,23 @@
 
 </div>
 
+<details>
+<summary>The query in the banner is real — copy it and paste it into advanced hunting</summary>
+<br/>
+
+```kql
+DeviceProcessEvents
+| where Timestamp > ago(30d)
+| where FileName =~ "powershell.exe"
+| where ProcessCommandLine has "-enc"
+| summarize count() by DeviceName
+| order by count_ desc
+```
+
+Encoded PowerShell per device, last 30 days. The full detection rule with the other flags (`-nop`, `-w hidden`, `-exec bypass`, `IEX`) is [suspicious_powershell_usage.kql](Hunting-Queries-Detection-Rules/Defender-For-Endpoint/suspicious_powershell_usage.kql).
+
+</details>
+
 <br/>
 
 Production-grade KQL for defenders running Microsoft Sentinel and Defender XDR. Every query is built around a threat that is actually being exploited, ships with its MITRE ATT&CK mapping in a consistent header, and is routed by the table it reads so you can find it by what you have, not by what it is called. New campaign packs land within days of public reporting.
