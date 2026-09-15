@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="KQL-Codex — campaign-driven detection content for Microsoft Sentinel and Defender XDR" width="100%"/>
+<img src="https://raw.githubusercontent.com/amaqsood90/KQL-Codex/assets/banner.svg" alt="KQL-Codex — campaign-driven detection content for Microsoft Sentinel and Defender XDR" width="100%"/>
 
 <br/>
 
