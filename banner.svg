@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="KQL-Codex — campaign-driven detection content for Microsoft Sentinel and Defender XDR">
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0060b0"/>
+      <stop offset="1" stop-color="#0a8fd6"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a8fd6"/>
+      <stop offset="1" stop-color="#0060b0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.16" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#0078d4" stop-opacity="0.14"/>
+      <stop offset="0.55" stop-color="#0078d4" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#0078d4" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#e3e9f0" stroke-width="1"/>
+    </pattern>
+    <clipPath id="ground-clip">
+      <rect x="0.5" y="0.5" width="1199" height="319" rx="12"/>
+    </clipPath>
+    <clipPath id="card-clip">
+      <rect x="760" y="52" width="400" height="216" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- ground -->
+  <g clip-path="url(#ground-clip)">
+    <rect width="1200" height="320" fill="#f7f9fc"/>
+    <rect width="1200" height="320" fill="url(#grid)"/>
+    <rect width="1200" height="320" fill="url(#glow)"/>
+    <rect x="0" y="0" width="5" height="320" fill="url(#bar)"/>
+  </g>
+  <rect x="0.5" y="0.5" width="1199" height="319" rx="12" fill="none" stroke="#d0d7de"/>
+
+  <!-- wordmark -->
+  <text x="70" y="146" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="84" font-weight="800" letter-spacing="-2.5">
+    <tspan fill="#1f2328">KQL</tspan><tspan fill="#b6c0cb">-</tspan><tspan fill="url(#accent)">Codex</tspan>
+  </text>
+
+  <!-- tagline -->
+  <text x="74" y="188" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="21" fill="#57606a">Campaign-driven detection content</text>
+  <text x="74" y="216" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="21" fill="#57606a">for Microsoft Sentinel and Defender XDR</text>
+
+  <!-- platform chips -->
+  <g font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.6" fill="#57606a" text-anchor="middle" dominant-baseline="middle">
+    <rect x="72"  y="250" width="100" height="28" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="122" y="265">SENTINEL</text>
+    <rect x="182" y="250" width="138" height="28" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="251" y="265">DEFENDER XDR</text>
+    <rect x="330" y="250" width="100" height="28" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="380" y="265">ENTRA ID</text>
+    <rect x="440" y="250" width="138" height="28" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="509" y="265">MITRE ATT&amp;CK</text>
+  </g>
+
+  <!-- editor pane -->
+  <rect x="760" y="52" width="400" height="216" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <g clip-path="url(#card-clip)">
+    <rect x="760" y="52" width="400" height="32" fill="#f6f8fa"/>
+  </g>
+  <line x1="760" y1="84" x2="1160" y2="84" stroke="#d0d7de"/>
+  <circle cx="778" cy="68" r="3.5" fill="#0a8fd6"/>
+  <text x="790" y="72.5" font-family="Consolas, Menlo, 'DejaVu Sans Mono', monospace" font-size="12" fill="#6e7781">hunting.kql</text>
+
+  <g font-family="Consolas, Menlo, 'DejaVu Sans Mono', monospace" font-size="14">
+    <text x="780" y="112" fill="#0550ae">DeviceProcessEvents</text>
+    <text x="780" y="136"><tspan fill="#6e7781">| </tspan><tspan fill="#cf222e">where</tspan><tspan fill="#24292f"> Timestamp </tspan><tspan fill="#cf222e">&gt;</tspan><tspan fill="#24292f"> </tspan><tspan fill="#8250df">ago</tspan><tspan fill="#24292f">(</tspan><tspan fill="#0550ae">30d</tspan><tspan fill="#24292f">)</tspan></text>
+    <text x="780" y="160"><tspan fill="#6e7781">| </tspan><tspan fill="#cf222e">where</tspan><tspan fill="#24292f"> FileName </tspan><tspan fill="#cf222e">=~</tspan><tspan fill="#24292f"> </tspan><tspan fill="#0a3069">"powershell.exe"</tspan></text>
+    <text x="780" y="184"><tspan fill="#6e7781">| </tspan><tspan fill="#cf222e">where</tspan><tspan fill="#24292f"> ProcessCommandLine </tspan><tspan fill="#cf222e">has</tspan><tspan fill="#24292f"> </tspan><tspan fill="#0a3069">"-enc"</tspan></text>
+    <text x="780" y="208"><tspan fill="#6e7781">| </tspan><tspan fill="#cf222e">summarize</tspan><tspan fill="#24292f"> </tspan><tspan fill="#8250df">count</tspan><tspan fill="#24292f">() </tspan><tspan fill="#cf222e">by</tspan><tspan fill="#24292f"> DeviceName</tspan></text>
+    <text x="780" y="232"><tspan fill="#6e7781">| </tspan><tspan fill="#cf222e">order by</tspan><tspan fill="#24292f"> count_ </tspan><tspan fill="#cf222e">desc</tspan></text>
+  </g>
+</svg>
